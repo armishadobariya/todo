@@ -310,6 +310,7 @@ const Dashboard = () => {
 						}
 						{showForm && (
 							<div className="dashboard_box" style={{ marginLeft: "2px" }}>
+								<input type="file" className='task_img'  />
 								<input type="text" className='task_name' placeholder='Task name' value={title} onChange={(e) => { setTitle(e.target.value) }} /><br /><br />
 								<input type="text" className='task_description' placeholder='Description' value={description} onChange={(e) => { setDescription(e.target.value) }} /><br /> <br />
 								<div className="controls">
