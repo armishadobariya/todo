@@ -15,32 +15,38 @@ import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search'; // Added import
 import InputBase from '@mui/material/InputBase';
 import { styled, alpha } from '@mui/material/styles';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddIcon from '@mui/icons-material/Add';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import axios from 'axios';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
-import { deleteTaskUrl, getTaskUrl, insertTaskUrl, updateTaskUrl } from './Api';
+import { deleteTaskUrl, getTaskUrl, insertTaskUrl, updateTaskUrl, checkBoxUrl } from './Api';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useNavigate } from 'react-router-dom';
-
-
+import ImageViewer from "react-simple-image-viewer";
 
 const Dashboard = () => {
-	const [age, setAge] = useState('');	
+	const [age, setAge] = useState('');
 	const [showForm, setShowForm] = useState(false);   // show add task
 	const [showUpdate, setShowUpdate] = useState(false);  // show update form 
+	const [image, setImage] = useState();  // show update form 
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [tasks, setTasks] = useState([]);  // show all the data
-
 	const [updateTaskId, setUpdateTaskId] = useState(null);
 	const [updateTitle, setUpdateTitle] = useState("");
 	const [updateDescription, setUpdateDescription] = useState("");
+	const [isViewerOpen, setIsViewerOpen] = useState(false);
+	const [viewerImage, setViewerImage] = useState("");
+
+	const [taskId, setTaskId] = useState("");
+
+
 
 	const navigate = useNavigate();
 
+	const handleImageChange = (event) => {
+		setImage(event.target.files[0]);
+	};
 
 	// Remain pervious task.
 
@@ -48,6 +54,11 @@ const Dashboard = () => {
 		const token = localStorage.getItem("token");
 		getTodo(token);
 	}, []);
+
+	const openImageViewer = (image) => {
+		setViewerImage(image);
+		setIsViewerOpen(true);
+	};
 
 	const logOut = () => {
 		localStorage.removeItem('token');
@@ -73,21 +84,20 @@ const Dashboard = () => {
 
 	}
 
-	// add task
-
 	const addTodo = async (e) => {
 		try {
 			e.preventDefault();
 
-			const insertTaskData = {
-				title: title,
-				description: description,
-			};
+			const formData = new FormData();
+			formData.append("image", image);
+			formData.append("title", title);
+			formData.append("description", description);
 
 			const token = localStorage.getItem("token");
 
-			const insertTaskResponse = await axios.post(insertTaskUrl, insertTaskData, {
+			const insertTaskResponse = await axios.post(insertTaskUrl, formData, {
 				headers: {
+					"Content-Type": "multipart/form-data",
 					authorization: token,
 				},
 			});
@@ -100,8 +110,10 @@ const Dashboard = () => {
 
 		setTitle("");
 		setDescription("");
+		setImage(null); // Reset the image state
 		setShowForm(false);
 	};
+
 
 	const handleDeleteTask = async (taskId, token) => {
 		try {
@@ -153,14 +165,45 @@ const Dashboard = () => {
 			// Handle error, show an error message, etc.
 		}
 	};
+	const handleCheckboxChange = async (taskId) => {
+		try {
+			const token = localStorage.getItem("token");
+
+			const checkdata = {
+				id: taskId,
+				isCompleted: true,
+			}
+			const response = await axios.put(checkBoxUrl, checkdata, {
+				headers: {
+					authorization: token,
+				},
+
+
+			});
+
+			console.log('Checkbox API Response:', response.data);
+			getTodo(token);
+
+			// Assuming the API call was successful, update the tasks state
+			setTasks((prevTasks) =>
+				prevTasks.map((task) =>
+					task.id === taskId ? { ...task, isCompleted: true } : task
+				)
+			);
+
+		} catch (error) {
+			console.error('Error updating checkbox:', error.message);
+			// Handle error, show an error message, etc.
+		}
+	};
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setAge(event.target.value);
 	}
+
 	const toggleForm = () => {
 		setShowForm(!showForm);
 	}
-
 
 	const toggleUpdate = (id, title, description) => {
 		setUpdateTaskId(id)
@@ -230,7 +273,7 @@ const Dashboard = () => {
 							}}
 						/>
 					</Search>
-					<AddIcon style={{ marginLeft: "1430px", marginBottom: '30px', marginTop: '-35px', color: "white", width: "50px", fontSize: '32px', cursor: 'pointer' }} onClick={toggleForm} />
+					<AddIcon style={{ marginLeft: "1415px", marginBottom: '30px', marginTop: '-35px', color: "white", width: "50px", fontSize: '32px', cursor: 'pointer' }} onClick={toggleForm} />
 					<PowerSettingsNewIcon style={{ color: 'white', fontSize: '32px', cursor: 'pointer', float: 'right', marginTop: '-60px', marginLeft: '1200px', marginRight: '20px' }} onClick={logOut} />
 				</div>
 			</div>
@@ -248,19 +291,49 @@ const Dashboard = () => {
 						<div className="tasks-list"><br />
 							<h5>Todos :</h5>
 							<ul style={{ listStyleType: "none" }}>
-								{tasks && tasks.map(task => (
 
+								{tasks && tasks.map(task => (
 									<li key={task.id}>
 										<div className="displaydata">
-											<RemoveCircleOutlineOutlinedIcon className='deleteicon' style={{ color: "#dc4c3e", marginTop: '10px' }} onClick={() => handleDeleteTask(task.id, localStorage.getItem("token"))} />
-											<h4 className='displaytitle'>{task.title}</h4> <br /> <h5>{task.description}</h5>
-											<EditCalendarOutlinedIcon className="editicon" style={{ justifyContent: "right", color: 'grey' }} onClick={() => toggleUpdate(task.id, task.title, task.description)}
+											<RemoveCircleOutlineOutlinedIcon
+												className='deleteicon'
+												style={{ color: "#dc4c3e", marginTop: '10px' }}
+												onClick={() => handleDeleteTask(task.id, localStorage.getItem("token"))}
 											/>
-
+											<input
+												type="checkbox"
+												className='check_box'
+												checked={task.isCompleted}
+												onChange={() => handleCheckboxChange(task.id)}
+											/>
+											<h4 className='displaytitle' onClick={() => openImageViewer(task.image)}>{task.title}</h4>
+											<br />
+											<h5>{task.description}</h5>
+											{task.image && (
+												<div onClick={() => openImageViewer(task.image)}>
+													<img src={task.image} alt="Task Image" className="task_image" />
+												</div>
+											)}
+											<EditCalendarOutlinedIcon
+												className="editicon"
+												style={{ justifyContent: "right", color: 'grey' }}
+												onClick={() => toggleUpdate(task.id, task.title, task.description)}
+											/>
 										</div>
-										<hr /><br />
+										<hr />
+										<br />
 									</li>
 								))}
+
+								{isViewerOpen && (
+									<ImageViewer
+										src={[viewerImage]}
+										currentIndex={0}
+										disableScroll={false}
+										onClose={() => setIsViewerOpen(false)}
+										style={{ height: '40px', width: '60px', backgroundColor: "white" }}
+									/>
+								)}
 							</ul>
 						</div>
 
@@ -309,11 +382,11 @@ const Dashboard = () => {
 						</div>
 						}
 						{showForm && (
-							<div className="dashboard_box" style={{ marginLeft: "2px" }}>
-								<input type="file" className='task_img'  />
+							<div className="dashboard_box1" style={{ marginLeft: "2px" }}>
+								<input type="file" name="image" onChange={handleImageChange} style={{ marginTop: "10px", marginLeft: "-322px" }} />
 								<input type="text" className='task_name' placeholder='Task name' value={title} onChange={(e) => { setTitle(e.target.value) }} /><br /><br />
 								<input type="text" className='task_description' placeholder='Description' value={description} onChange={(e) => { setDescription(e.target.value) }} /><br /> <br />
-								<div className="controls">
+								<div className="controls"> 
 									<LocalizationProvider dateAdapter={AdapterDayjs}>
 										<DatePicker sx={{ width: '180px', height: '20px' }} className="customDatePicker" />
 									</LocalizationProvider>
