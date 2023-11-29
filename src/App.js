@@ -2,7 +2,7 @@ import React from 'react'
 import ForgotPassword from './auth/ForgotPassword';
 import ResetPassword from './auth/ResetPassword';
 import Signup from './auth/Signup';
-import { Route, Router, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Signin from './auth/Signin';
 import Dashboard from './auth/Dashboard';
 import PrivatePage from './router/privatePage';

@@ -15,18 +15,22 @@ import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search'; // Added import
 import InputBase from '@mui/material/InputBase';
 import { styled, alpha } from '@mui/material/styles';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddIcon from '@mui/icons-material/Add';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import axios from 'axios';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
-import { deleteTaskUrl, getTaskUrl, insertTaskUrl, updateTaskUrl, checkBoxUrl } from './Api';
+import { checkBoxUrl } from './Api';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useNavigate } from 'react-router-dom';
 import ImageViewer from "react-simple-image-viewer";
-
-
+import { useDispatch, useSelector } from "react-redux";
+import {
+	addTodoData,
+	deleteTodoData,
+	getTodo,
+	updateTodoData,
+	checkTodoData,
+} from "../store/todo/todoMethods";
 
 const Dashboard = () => {
 	const [age, setAge] = useState('');
@@ -35,20 +39,16 @@ const Dashboard = () => {
 	const [image, setImage] = useState();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [tasks, setTasks] = useState([]);  // show all the data
 	const [updateTaskId, setUpdateTaskId] = useState(null);
 	const [updateTitle, setUpdateTitle] = useState("");
 	const [updateDescription, setUpdateDescription] = useState("");
-
 	const [updateIsComplated, setUpdateIsComplated] = useState("");
 	const [isViewerOpen, setIsViewerOpen] = useState(false);
 	const [viewerImage, setViewerImage] = useState("");
-
-	const [taskId, setTaskId] = useState("");
-
-
-
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	let tasks = useSelector((state) => state.todo.todos);
 
 	const handleImageChange = (event) => {
 		setImage(event.target.files[0]);
@@ -57,8 +57,7 @@ const Dashboard = () => {
 	// Remain pervious task.
 
 	useEffect(() => {
-		const token = localStorage.getItem("token");
-		getTodo(token);
+		getTodo()(dispatch);
 	}, []);
 
 	const openImageViewer = (image) => {
@@ -73,174 +72,54 @@ const Dashboard = () => {
 
 	// display all task 
 
-	const getTodo = async (token) => {
-		try {
-			const getTaskResponse = await axios.get(getTaskUrl, {
-				headers: {
-					authorization: token,
-				},
-			});
-			console.log("Get Task Response:", getTaskResponse.data);
-			const result = getTaskResponse.data;
-			setState(result.data);
-		} catch (error) {
-			console.error('Error:', error.message);
-		}
+	// const getTodo = async (token) => {
+	// 	try {
+	// 		const getTaskResponse = await axios.get(getTaskUrl, {
+	// 			headers: {
+	// 				authorization: token,
+	// 			},
+	// 		});
+	// 		console.log("Get Task Response:", getTaskResponse.data);
+	// 		const result = getTaskResponse.data;
+	// 		setState(result.data);
+	// 	} catch (error) {
+	// 		console.error('Error:', error.message);
+	// 	}
 
-	}
+	// }
+
 	const [state, setState] = useState([]);
-
-	function insertData(newData) {
-		setState((pre) => [...pre, newData]);
-	}
-
-	function updateData(id, updatedData) {
-		setState(pre => pre.map(tasks => {
-			if (tasks.id === id) {
-				return updatedData;
-			}
-			return tasks;
-		}));
-	}
-
-	function deleteData(id) {
-		setState(pre => pre.filter(tasks => tasks.id !== id));
-	}
-
-	// const [checked, setChecked] = useState(false);
-
 
 
 	const addTodo = async (e) => {
-		try {
-			e.preventDefault();
-
-			const formData = new FormData();
-			formData.append("image", image);
-			formData.append("title", title);
-			formData.append("description", description);
-
-			const token = localStorage.getItem("token");
-
-			const insertTaskResponse = await axios.post(insertTaskUrl, formData, {
-				headers: {
-
-					authorization: token,
-				},
-			});
-
-			console.log("Insert Task Response:", insertTaskResponse.data);
-			const result = insertTaskResponse.data;
-			console.log(result);
-			insertData(result.data);
-
-		} catch (error) {
-			console.error('Error:', error.message);
-		}
-
+		addTodoData({ image, title, description })(dispatch);
 		setTitle("");
 		setDescription("");
-		setImage(null); // Reset the image state
+		setImage(null);
 		setShowForm(false);
+
 	};
 
-
 	const handleDeleteTask = async (taskId, token) => {
-		try {
-
-			const response = await axios.delete(deleteTaskUrl, {
-				headers: {
-					Authorization: token,
-				},
-				data: {
-					id: taskId,
-				},
-			});
-			console.log('Task deleted successfully:', response.data);
-			deleteData(taskId);
-		} catch (error) {
-			console.error('Error deleting task:', error.message);
-		}
+		deleteTodoData({ taskId, token })(dispatch);
 	};
 
 	const updateTodo = async () => {
-		try {
-			const token = localStorage.getItem("token");
-
-			const updateTaskData = {
-				id: updateTaskId,
-				title: updateTitle,
-				description: updateDescription,
-				isCompleted: updateIsComplated, // Set your desired value for isCompleted
-			};
-
-			const response = await axios.put(updateTaskUrl, updateTaskData, {
-				headers: {
-					authorization: token,
-				},
-
-			});
-
-			console.log("Task updated successfully:", response.data);
-
-			updateData(updateTaskId, response.data.data);
-
-
-
-			setUpdateTaskId(null);
-			setUpdateTitle("");
-			setUpdateDescription("");
-			setShowUpdate(false);
-
-		}
-		catch (error) {
-			console.error('Error updating task:', error.message);
-			// Handle error, show an error message, etc.
-		}
+		updateTodoData({
+			id: updateTaskId,
+			title: updateTitle,
+			description: updateDescription,
+			isCompleted: updateIsComplated,
+		})(dispatch);
+		setUpdateTaskId(null);
+		setUpdateTitle("");
+		setUpdateDescription("");
+		setShowUpdate(false);
 	};
-	const handleCheckboxChange = async (taskId, isCompleted) => {
-		try {
-			const token = localStorage.getItem("token");
 
-			// Assuming the API call was successful, update the tasks state
-			setState((pre) => {
-				return pre.map((task) => {
-					if (task.id === taskId) {
-						return {
-							...task, isCompleted: !isCompleted
-						}
-					} else {
-						return task
-					}
-				})
-			})
-
-			const checkdata = {
-				id: taskId,
-				isCompleted: !isCompleted,
-			}
-			const response = await axios.put(checkBoxUrl, checkdata, {
-				headers: {
-					authorization: token,
-				},
-			});
-
-			console.log('Checkbox API Response:', response.data);
-			console.log(state);
-
-
-		} catch (error) {
-			let newData = state.map((task) => task.id === taskId ? { ...task, isCompleted: !isCompleted } : task);
-			setState(newData);
-			console.error('Error updating checkbox:', error.message);
-
-		}
-	};
-	// const handleChanges = (e) => {
-	// 	setState(!state.tasks.isCompleted);
-	// 	e.preventDefault(); 
-	//   };
-
+	const checkBoxTodo = async (taskId, isCompleted) => {
+		dispatch(checkTodoData({ taskId, isCompleted }));
+	}
 
 	const handleChange = (event) => {
 		setAge(event.target.value);
@@ -338,7 +217,7 @@ const Dashboard = () => {
 							<h5>Todos :</h5>
 							<ul style={{ listStyleType: "none" }}>
 
-								{state && state.map(task => (
+								{tasks && tasks.map(task => (
 									<li key={task.id}>
 										<div className="displaydata">
 											<RemoveCircleOutlineOutlinedIcon
@@ -350,7 +229,7 @@ const Dashboard = () => {
 												type="checkbox"
 												className='check_box'
 												checked={task.isCompleted}
-												onChange={() => handleCheckboxChange(task.id, task.isCompleted)}
+												onChange={() => checkBoxTodo(task.id, task.isCompleted)}
 											/>
 											<h4 className='displaytitle' onClick={() => openImageViewer(task.image)}>{task.title}</h4>
 											<br />
