@@ -15,12 +15,34 @@ import { signUpUrl } from './Api';
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
+const RedditTextField = styled((props) => (
+	<TextField InputProps={{ disableUnderline: true }} {...props} />
+))
+	(({ theme }) => ({
+		'& .MuiFilledInput-root': {
+			overflow: 'hidden',
+			borderRadius: 4,
+			backgroundColor: 'transparent',
+			border: '1px solid',
+			width: '350px',
+			'&:hover': {
+				backgroundColor: 'transparent',
+			},
+			'&.Mui-focused': {
+				backgroundColor: 'transparent',
+			},
+		},
+	}));
+
+
 const Signup = () => {
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [pass, setPass] = useState('');
 	const [response, setResponse] = useState(null);
+	// const [emailError, setEmailError] = useState('');
+	const [passwordError, setPasswordError] = useState('');
 
 	const navigate = useNavigate();
 
@@ -35,22 +57,39 @@ const Signup = () => {
 		);
 	}
 
+	const validatePassword = (p) => {
+		// const minLength = 8;
+
+		if (p.length < 8) {
+			// console.log("kgdsf", p.length);
+			setPasswordError(`Password must be between 8 characters`);
+			return false;
+		}
+		setPasswordError('');
+		return true;
+	};
 
 	const RegisterUser = async (e) => {
 		try {
 			e.preventDefault();
-			const reqData =
-			{
-				name: name,
-				email: email,
-				password: pass,
-			};
-			const response = await axios.post(signUpUrl, reqData);
-			// setResponse(alert("success", "Register Successfully ..."));
-			console.log(response);
-			setResponse("success", 'success..');
-			setResponse(() => { navigate('/Signin') })
+
+			if (validatePassword(pass)) {
+
+				const reqData =
+				{
+					name: name,
+					email: email,
+					password: pass,
+				};
+				const response = await axios.post(signUpUrl, reqData);
+				// setResponse(alert("success", "Register Successfully ..."));
+				console.log(response);
+				setResponse("success", 'success..');
+				setResponse(() => { navigate('/Signin') })
+			}
+
 		}
+
 		catch (error) {
 			// console.error('Error:', error);
 			// setResponse("error", 'error..');
@@ -59,24 +98,7 @@ const Signup = () => {
 	};
 
 
-	const RedditTextField = styled((props) => (
-		<TextField InputProps={{ disableUnderline: true }} {...props} />
-	))
-		(({ theme }) => ({
-			'& .MuiFilledInput-root': {
-				overflow: 'hidden',
-				borderRadius: 4,
-				backgroundColor: 'transparent',
-				border: '1px solid',
-				width: '350px',
-				'&:hover': {
-					backgroundColor: 'transparent',
-				},
-				'&.Mui-focused': {
-					backgroundColor: 'transparent',
-				},
-			},
-		}));
+
 
 
 	return (
@@ -90,7 +112,7 @@ const Signup = () => {
 
 
 					<div className="main_header">
-						<img src={todo} alt="logo" height="40px" width="150px" />
+						<img src={todo} alt="logo" height="37px" width="140px" />
 					</div>
 					<div className="child_header">
 						<h1 className='chead'>Sign up</h1>
@@ -107,8 +129,8 @@ const Signup = () => {
 								</div>
 								<div className='google'>
 									<img src={apple} alt="apple image" height='30px' width='30px' /><strong className='app'>  Continue with Apple</strong>
-								</div><br />
-								<hr className='line' /><br />
+								</div>
+								<hr className='line' />
 							</div>
 
 
@@ -128,6 +150,8 @@ const Signup = () => {
 										onChange={(e) => { setName(e.target.value) }}
 
 									/>
+
+
 								</div>
 								<div>
 									<RedditTextField
@@ -157,11 +181,12 @@ const Signup = () => {
 											style: { color: 'black' }
 										}}
 										value={pass}
-										onChange={(e) => { setPass(e.target.value) }}
-
+										onChange={(e) => {
+											setPass(e.target.value);
+											validatePassword(e.target.value);
+										}}
 									/>
-
-
+									<p style={{ color: 'red' }}>{passwordError}</p>
 								</div>
 							</div>
 							<div className='btn'>
@@ -173,18 +198,16 @@ const Signup = () => {
 									width: '350px',
 									height: '52px',
 									marginBottom: '13px',
-									marginLeft:'-14px'
+									marginLeft: '-14px'
 
 								}} variant="contained" disableElevation onClick={RegisterUser} >
 									Sign up with Email
-								</Button> <br /><br />
+								</Button> <br />
 							</div>
 							<div className="pra">
 								<p>By continuing with Google, Apple, or Email, you agree to Todoist’s</p>
 								<a href='Terms of Service'>Terms of Service</a> and <a href='Privacy Policy'>Privacy Policy.</a><br />
 								<hr className='line1' />
-
-
 							</div>
 							<div>
 							</div>

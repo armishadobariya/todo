@@ -15,6 +15,24 @@ import { signInUrl } from './Api.jsx';
 
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+const RedditTextField = styled((props) => (
+	<TextField InputProps={{ disableUnderline: true }} {...props} />
+))
+	(({ theme }) => ({
+		'& .MuiFilledInput-root': {
+			overflow: 'hidden',
+			borderRadius: 4,
+			backgroundColor: 'transparent',
+			border: '1px solid',
+			width: '380px',
+			'&:hover': {
+				backgroundColor: 'transparent',
+			},
+			'&.Mui-focused': {
+				backgroundColor: 'transparent',
+			},
+		},
+	}));
 
 
 
@@ -25,6 +43,7 @@ const Signin = () => {
 	const [email, setEmail] = useState("");
 	const [pass, setPass] = useState("");
 	const [response, setResponse] = useState(null);
+	const [verificationResult, setVerificationResult] = useState('');
 
 	function alert(type, msg) {
 		const bs_class = (type === "success") ? "alert-success" : "alert-danger";
@@ -46,44 +65,33 @@ const Signin = () => {
 			};
 			const responseData = await axios.post(signInUrl, reqdata);
 			if (responseData.status === 200) {
+
 				const { token } = responseData.data;
 				localStorage.setItem("token", token);
 				// setResponse(alert("success", "Register Successfully ..."));
 				navigate("/");
 
 			}
+			// if (!responseData.data.email.exists) {
+			// 	setVerificationResult('email not exists');
+			// }
+			// else if (!responseData.data.password.exists) {
+			// 	setVerificationResult('password not exists');
+			// }
+			// else {
+			// 	setVerificationResult('Data Exists');
+			// }
 		}
 		catch (error) {
-			// setResponse(error);
-			// setResponse("error:", 'error');
-			// const errorMessage = error.response?.data.message || 'An error occurred';
-			setResponse(alert("error", 'Invalid Password ...'));
-
-
+			setResponse(alert("error", 'Email or Password not exists'));
+			// setVerificationResult('123');
 		}
 
 	};
 
 
 
-	const RedditTextField = styled((props) => (
-		<TextField InputProps={{ disableUnderline: true }} {...props} />
-	))
-		(({ theme }) => ({
-			'& .MuiFilledInput-root': {
-				overflow: 'hidden',
-				borderRadius: 4,
-				backgroundColor: 'transparent',
-				border: '1px solid',
-				width: '380px',
-				'&:hover': {
-					backgroundColor: 'transparent',
-				},
-				'&.Mui-focused': {
-					backgroundColor: 'transparent',
-				},
-			},
-		}));
+
 
 	const [showPassword, setShowPassword] = React.useState(false);
 
@@ -107,10 +115,10 @@ const Signin = () => {
 
 				<div className="div_1">
 					<div className="log_header">
-						<img src={todo} alt="logo" height="40px" width="150px" />
+						<img src={todo} alt="logo" height="37px" width="140px" />
 					</div>
 					<div className="log_child">
-						<h1 className='chead'>Log in</h1>
+						<h1 className='chead1'>Log in</h1>
 					</div>
 					<div className="form">
 						<form action="">
@@ -125,9 +133,9 @@ const Signin = () => {
 								</div>
 								<div className='log_google'>
 									<img src={apple} alt="apple image" height='30px' width='30px' /><strong className='app'>  Continue with Apple</strong>
-								</div><br />
+								</div>
 								{/* <fieldset className='line' /> */}
-								<hr className='log_line' /><br />
+								<hr className='log_line' />
 							</div>
 
 
@@ -149,6 +157,7 @@ const Signin = () => {
 
 									/>
 								</div>
+								<h1>{verificationResult}</h1>
 								<div>
 									<RedditTextField
 										label="Password"
@@ -176,7 +185,7 @@ const Signin = () => {
 									width: '380px',
 									height: '52px',
 									marginBottom: '13px',
-									marginLeft:'-14px'
+									marginLeft: '-14px'
 
 
 								}} variant="contained" disableElevation onClick={LoginUser}>

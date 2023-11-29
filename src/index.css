@@ -23,7 +23,7 @@
 }
 
 .forgot_child {
-  margin-left: 250px;
+  margin-left: 241px;
   margin-top: 20px;
   margin-right: 300px;
   flex-direction: column;
@@ -44,14 +44,15 @@
 }
 
 .content {
-  margin-top: 100px;
+  margin-top: 60px;
   padding-left: 300px;
   max-width: 630px;
 }
 
 .content h1 {
   font-weight: 800;
-  letter-spacing: 1px
+  letter-spacing: 1px;
+  font-size: 35px;
 }
 
 .content p {
@@ -60,7 +61,7 @@
   margin-top: 7px;
 }
 
-.forgotinput {
+/* .forgotinput {
   border-radius: 7px;
   background-color: #ffffff;
   width: 300px;
@@ -69,11 +70,12 @@
   padding-left: 14px;
   margin-top: 14px;
   font-size: 18px;
-}
+} */
 
 .forgotline {
   width: 300px;
   border: 1px solid rgb(212, 211, 211);
+  margin-top: -2px;
 }
 
 .forgot_end {
@@ -83,9 +85,9 @@
 
 }
 
-.forgot_end .loginlink {
-  margin-top: 120px;
-}
+/* .forgot_end .loginlink {
+  margin-top: 10px;
+} */
 
 .forgot_end .forgotline {
   margin-bottom: 10px;

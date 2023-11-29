@@ -26,20 +26,40 @@ const ResetPassword = () => {
 	const [cpassword, setCpassword] = useState("");
 	const [response, setResponse] = useState(null);
 	const location = useLocation();
+	const [passwordError, setPasswordError] = useState('');
+
+
+	const validatePassword = (p, cf) => {
+		// const minLength = 8;
+
+		if (p.length < 8) {
+			setPasswordError(`Password must be between 8 characters`);
+			return false;
+		}
+		else if (p !== cf) {
+			setPasswordError(`Password and confirm password is not same`);
+			return false;
+		}
+		setPasswordError('');
+		return true;
+	};
 
 
 	const ResetPass = async (e) => {
 		try {
 			e.preventDefault();
-			const email = location.state;
-			console.log(email);
-			const reqdata = {
-				email: email,
-				password: password,
-			};
-			const responseData = await axios.post(resetPasswordUrl, reqdata);
-			setResponse("success: ", 'success');
-			setResponse(() => { navigate("/Signin") });
+
+			if (validatePassword(password, cpassword)) {
+				const email = location.state;
+				console.log(email);
+				const reqdata = {
+					email: email,
+					password: password,
+				};
+				const responseData = await axios.post(resetPasswordUrl, reqdata);
+				setResponse("success: ", 'success');
+				setResponse(() => { navigate("/Signin") });
+			}
 		}
 		catch (error) {
 			setResponse(error);
@@ -63,7 +83,7 @@ const ResetPassword = () => {
 				</div>
 				<div className="reset_child">
 					<div className="logo">
-						<img src={logo} alt="" height="45px" />
+						<img src={logo} alt="" height="37px" width='140px' />
 					</div>
 
 
@@ -73,7 +93,7 @@ const ResetPassword = () => {
 						<p className='reset_p'>This will End Your active Session for your account and issue a new API token.</p>
 						<form action="" className='reset_form'>
 							<div className="new_pass">
-								<label className='reset_label'>Enter a new Password</label><br />
+								<label className='reset_label'>Enter a new Password</label>
 
 								<FormControl sx={{ m: 1, width: '25ch' }} variant="outlined" />
 
@@ -85,7 +105,10 @@ const ResetPassword = () => {
 										borderRadius: "7px"
 									}}
 									value={password}
-									onChange={(e) => { setPassword(e.target.value) }}
+									onChange={(e) => {
+										setPassword(e.target.value);
+										// validatePassword(e.target.value);
+									}}
 									id="outlined-adornment-password"
 									type={showPassword ? 'text' : 'password'}
 									endAdornment={
@@ -101,12 +124,13 @@ const ResetPassword = () => {
 									}
 
 								/>
+								<p style={{ color: 'red' }}>{passwordError}</p>
 
 
 							</div>
 
-							<div className="confirm_pass"><br />
-								<label className='reset_label'>Confirm your new Password</label><br />
+							<div className="confirm_pass">
+								<label className='reset_label'>Confirm your new Password</label>
 								<FormControl sx={{ m: 1, width: '25ch' }} variant="outlined" />
 
 								<OutlinedInput
@@ -135,7 +159,7 @@ const ResetPassword = () => {
 								/>
 
 							</div>
-							<br />
+							
 
 							<p className='form_p'>Your password must be at least 8 charatcor long. Avoid common words and Pattern. </p><br />
 							{/* <div className="reset_button ">
@@ -148,11 +172,11 @@ const ResetPassword = () => {
 								fontSize: "16px",
 								width: '500px',
 								height: '52px',
-								marginBottom: '13px',
+								marginBottom: '5px',
 
 							}} variant="contained" disableElevation onClick={ResetPass}>
 								Reset My Password
-							</Button> <br /><br />
+							</Button> 
 
 
 						</form>

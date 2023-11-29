@@ -15,7 +15,9 @@ import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search'; // Added import
 import InputBase from '@mui/material/InputBase';
 import { styled, alpha } from '@mui/material/styles';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddIcon from '@mui/icons-material/Add';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import axios from 'axios';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
@@ -24,17 +26,21 @@ import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useNavigate } from 'react-router-dom';
 import ImageViewer from "react-simple-image-viewer";
 
+
+
 const Dashboard = () => {
 	const [age, setAge] = useState('');
 	const [showForm, setShowForm] = useState(false);   // show add task
 	const [showUpdate, setShowUpdate] = useState(false);  // show update form 
-	const [image, setImage] = useState();  // show update form 
+	const [image, setImage] = useState();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [tasks, setTasks] = useState([]);  // show all the data
 	const [updateTaskId, setUpdateTaskId] = useState(null);
 	const [updateTitle, setUpdateTitle] = useState("");
 	const [updateDescription, setUpdateDescription] = useState("");
+
+	const [updateIsComplated, setUpdateIsComplated] = useState("");
 	const [isViewerOpen, setIsViewerOpen] = useState(false);
 	const [viewerImage, setViewerImage] = useState("");
 
@@ -76,13 +82,34 @@ const Dashboard = () => {
 			});
 			console.log("Get Task Response:", getTaskResponse.data);
 			const result = getTaskResponse.data;
-			setTasks(result.data);
-			console.log(tasks);
+			setState(result.data);
 		} catch (error) {
 			console.error('Error:', error.message);
 		}
 
 	}
+	const [state, setState] = useState([]);
+
+	function insertData(newData) {
+		setState((pre) => [...pre, newData]);
+	}
+
+	function updateData(id, updatedData) {
+		setState(pre => pre.map(tasks => {
+			if (tasks.id === id) {
+				return updatedData;
+			}
+			return tasks;
+		}));
+	}
+
+	function deleteData(id) {
+		setState(pre => pre.filter(tasks => tasks.id !== id));
+	}
+
+	// const [checked, setChecked] = useState(false);
+
+
 
 	const addTodo = async (e) => {
 		try {
@@ -97,13 +124,16 @@ const Dashboard = () => {
 
 			const insertTaskResponse = await axios.post(insertTaskUrl, formData, {
 				headers: {
-					"Content-Type": "multipart/form-data",
+
 					authorization: token,
 				},
 			});
 
 			console.log("Insert Task Response:", insertTaskResponse.data);
-			getTodo(token);
+			const result = insertTaskResponse.data;
+			console.log(result);
+			insertData(result.data);
+
 		} catch (error) {
 			console.error('Error:', error.message);
 		}
@@ -127,8 +157,7 @@ const Dashboard = () => {
 				},
 			});
 			console.log('Task deleted successfully:', response.data);
-			getTodo(token);
-
+			deleteData(taskId);
 		} catch (error) {
 			console.error('Error deleting task:', error.message);
 		}
@@ -142,7 +171,7 @@ const Dashboard = () => {
 				id: updateTaskId,
 				title: updateTitle,
 				description: updateDescription,
-				isCompleted: false, // Set your desired value for isCompleted
+				isCompleted: updateIsComplated, // Set your desired value for isCompleted
 			};
 
 			const response = await axios.put(updateTaskUrl, updateTaskData, {
@@ -153,7 +182,11 @@ const Dashboard = () => {
 			});
 
 			console.log("Task updated successfully:", response.data);
-			getTodo(token);
+
+			updateData(updateTaskId, response.data.data);
+
+
+
 			setUpdateTaskId(null);
 			setUpdateTitle("");
 			setUpdateDescription("");
@@ -165,50 +198,63 @@ const Dashboard = () => {
 			// Handle error, show an error message, etc.
 		}
 	};
-	const handleCheckboxChange = async (taskId) => {
+	const handleCheckboxChange = async (taskId, isCompleted) => {
 		try {
 			const token = localStorage.getItem("token");
 
+			// Assuming the API call was successful, update the tasks state
+			setState((pre) => {
+				return pre.map((task) => {
+					if (task.id === taskId) {
+						return {
+							...task, isCompleted: !isCompleted
+						}
+					} else {
+						return task
+					}
+				})
+			})
+
 			const checkdata = {
 				id: taskId,
-				isCompleted: true,
+				isCompleted: !isCompleted,
 			}
 			const response = await axios.put(checkBoxUrl, checkdata, {
 				headers: {
 					authorization: token,
 				},
-
-
 			});
 
 			console.log('Checkbox API Response:', response.data);
-			getTodo(token);
+			console.log(state);
 
-			// Assuming the API call was successful, update the tasks state
-			setTasks((prevTasks) =>
-				prevTasks.map((task) =>
-					task.id === taskId ? { ...task, isCompleted: true } : task
-				)
-			);
 
 		} catch (error) {
+			let newData = state.map((task) => task.id === taskId ? { ...task, isCompleted: !isCompleted } : task);
+			setState(newData);
 			console.error('Error updating checkbox:', error.message);
-			// Handle error, show an error message, etc.
+
 		}
 	};
+	// const handleChanges = (e) => {
+	// 	setState(!state.tasks.isCompleted);
+	// 	e.preventDefault(); 
+	//   };
 
-	const handleChange = (event: SelectChangeEvent) => {
+
+	const handleChange = (event) => {
 		setAge(event.target.value);
 	}
-
 	const toggleForm = () => {
 		setShowForm(!showForm);
 	}
 
-	const toggleUpdate = (id, title, description) => {
+
+	const toggleUpdate = (id, title, description, isCompleted) => {
 		setUpdateTaskId(id)
 		setUpdateTitle(title);
 		setUpdateDescription(description);
+		setUpdateIsComplated(isCompleted);
 		setShowUpdate(!showUpdate);
 	}
 
@@ -292,7 +338,7 @@ const Dashboard = () => {
 							<h5>Todos :</h5>
 							<ul style={{ listStyleType: "none" }}>
 
-								{tasks && tasks.map(task => (
+								{state && state.map(task => (
 									<li key={task.id}>
 										<div className="displaydata">
 											<RemoveCircleOutlineOutlinedIcon
@@ -304,7 +350,7 @@ const Dashboard = () => {
 												type="checkbox"
 												className='check_box'
 												checked={task.isCompleted}
-												onChange={() => handleCheckboxChange(task.id)}
+												onChange={() => handleCheckboxChange(task.id, task.isCompleted)}
 											/>
 											<h4 className='displaytitle' onClick={() => openImageViewer(task.image)}>{task.title}</h4>
 											<br />
@@ -339,6 +385,7 @@ const Dashboard = () => {
 
 						{showUpdate && (
 							<div className="dashboard_box" style={{ marginLeft: "2px" }}>
+
 								<input type="text" className='task_name' placeholder='Task name' value={updateTitle} onChange={(e) => { setUpdateTitle(e.target.value) }} /><br /><br />
 								<input type="text" className='task_description' placeholder='Description' value={updateDescription} onChange={(e) => { setUpdateDescription(e.target.value) }} /><br /> <br />
 								<div className="controls">
@@ -386,7 +433,7 @@ const Dashboard = () => {
 								<input type="file" name="image" onChange={handleImageChange} style={{ marginTop: "10px", marginLeft: "-322px" }} />
 								<input type="text" className='task_name' placeholder='Task name' value={title} onChange={(e) => { setTitle(e.target.value) }} /><br /><br />
 								<input type="text" className='task_description' placeholder='Description' value={description} onChange={(e) => { setDescription(e.target.value) }} /><br /> <br />
-								<div className="controls"> 
+								<div className="controls">
 									<LocalizationProvider dateAdapter={AdapterDayjs}>
 										<DatePicker sx={{ width: '180px', height: '20px' }} className="customDatePicker" />
 									</LocalizationProvider>

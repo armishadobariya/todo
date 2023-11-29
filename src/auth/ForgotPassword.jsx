@@ -10,6 +10,24 @@ import { useState } from 'react';
 import '../index.css'
 import { forgotPasswordUrl, verifyOtpUrl } from './Api';
 
+const RedditTextField = styled((props) => (
+	<TextField InputProps={{ disableUnderline: true }} {...props} />
+))
+	(({ theme }) => ({
+		'& .MuiFilledInput-root': {
+			overflow: 'hidden',
+			borderRadius: 4,
+			backgroundColor: 'transparent',
+			border: '1px solid',
+			width: '300px',
+			'&:hover': {
+				backgroundColor: 'transparent',
+			},
+			'&.Mui-focused': {
+				backgroundColor: 'transparent',
+			},
+		},
+	}));
 
 
 
@@ -22,6 +40,8 @@ const ForgotPassword = () => {
 	const [otp, setOtp] = useState("");
 	const [response, setResponse] = useState(null);
 	const [showOtp, setShowOtp] = useState(false);
+	const [verifyEmail, setVerifyEmail] = useState(" ");
+
 
 	const VerifyOtp = async (e) => {
 		try {
@@ -41,44 +61,41 @@ const ForgotPassword = () => {
 
 	};
 
-	const ForgotPassword = async (e) => {
+	// const ForgotPassword = async (e) => {
+	// 	try {
+	// 		e.preventDefault();
+	// 		const reqdata = {
+	// 			email: email,
+	// 		};
+	// 		const responseData = await axios.post(forgotPasswordUrl, reqdata);
+	// 		setResponse("success: ", responseData.data);
+	// 	}
+	// 	catch (error) {
+	// 		setResponse(error);
+	// 		setResponse("error:", 'error');
+	// 	}
+	// };
+
+	const toggleForm = () => {
+		setShowOtp(!showOtp);
+		console.log('form toggeld');
+	}
+
+	const checkEmailExists = async () => {
 		try {
-			e.preventDefault();
 			const reqdata = {
 				email: email,
 			};
 			const responseData = await axios.post(forgotPasswordUrl, reqdata);
-			setResponse("success: ", responseData.data);
-		}
-		catch (error) {
-			setResponse(error);
-			setResponse("error:", 'error');
+			setVerifyEmail(responseData.data.message);
+			toggleForm();
+			// if (responseData.data.exists) {
+			// 	toggleForm(); // Open the form if the email exists
+			// }
+		} catch (error) {
+			setVerifyEmail("Email not found");
 		}
 	};
-
-	const toggleForm = () => {
-		setShowOtp(!showOtp);
-	}
-
-	const RedditTextField = styled((props) => (
-		<TextField InputProps={{ disableUnderline: true }} {...props} />
-	))
-		(({ theme }) => ({
-			'& .MuiFilledInput-root': {
-				overflow: 'hidden',
-				borderRadius: 4,
-				backgroundColor: 'transparent',
-				border: '1px solid',
-				width: '300px',
-				'&:hover': {
-					backgroundColor: 'transparent',
-				},
-				'&.Mui-focused': {
-					backgroundColor: 'transparent',
-				},
-			},
-		}));
-
 
 	return (
 		<div className="forgot_main">
@@ -94,7 +111,7 @@ const ForgotPassword = () => {
 
 			<div className="col">
 				<div className="forgot_child">
-					<img src={todo} alt="" />
+					<img src={todo} alt="" height='37px' width='140px' />
 				</div>
 
 				<div className="content">
@@ -118,22 +135,11 @@ const ForgotPassword = () => {
 						onChange={(e) => { setEmail(e.target.value) }}
 
 					/>
-					<br /><br />
 
-					{/* <Button style={{
-						borderRadius: 7,
-						backgroundColor: "#dc4c3e",
-						padding: "6px 30px",
-						fontSize: "16px",
-						width: '300px',
-						height: '50px',
+					<br />
+					<p style={{ color: "red" }}>{verifyEmail}</p>
 
-
-					}} variant="contained" disableElevation onClick={ForgotPassword}>
-						Get OTP
-					</Button> <br /><br /> */}
-
-					{!showOtp && <div onClick={toggleForm} style={{ cursor: "pointer" }}>
+					{!showOtp && <div style={{ cursor: "pointer" }}>
 						<Button style={{
 							borderRadius: 7,
 							backgroundColor: "#dc4c3e",
@@ -142,10 +148,11 @@ const ForgotPassword = () => {
 							width: '300px',
 							height: '50px',
 
-
-						}} variant="contained" disableElevation onClick={ForgotPassword}>
+						}} variant="contained" disableElevation onClick={checkEmailExists}>
 							Get OTP
 						</Button> <br /><br />
+
+
 					</div>
 					}
 
@@ -177,18 +184,13 @@ const ForgotPassword = () => {
 								fontSize: "16px",
 								width: '300px',
 								height: '50px',
-
-
 							}} variant="contained" disableElevation onClick={VerifyOtp}>
 								Reset my password
 							</Button>
 						</>
 					)}
 
-
-
 					<br /><br />
-
 
 					<div className="forgot_end">
 						<hr className='forgotline' />
