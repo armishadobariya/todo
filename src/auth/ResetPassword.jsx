@@ -10,7 +10,7 @@ import img from "../images/img1.png";
 import logo from "../images/Todoist_logo.png";
 import Button from '@mui/material/Button';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { resetPasswordUrl } from "./Api";
 
 
@@ -28,9 +28,12 @@ const ResetPassword = () => {
 	const location = useLocation();
 	const [passwordError, setPasswordError] = useState('');
 
+	const email = location.state;
+	if (email === null) {
+		return <Navigate to='/ForgotPassword' />
+	}
 
 	const validatePassword = (p, cf) => {
-		// const minLength = 8;
 
 		if (p.length < 8) {
 			setPasswordError(`Password must be between 8 characters`);
@@ -51,6 +54,7 @@ const ResetPassword = () => {
 
 			if (validatePassword(password, cpassword)) {
 				const email = location.state;
+
 				console.log(email);
 				const reqdata = {
 					email: email,
@@ -159,7 +163,7 @@ const ResetPassword = () => {
 								/>
 
 							</div>
-							
+
 
 							<p className='form_p'>Your password must be at least 8 charatcor long. Avoid common words and Pattern. </p><br />
 							{/* <div className="reset_button ">
@@ -176,7 +180,7 @@ const ResetPassword = () => {
 
 							}} variant="contained" disableElevation onClick={ResetPass}>
 								Reset My Password
-							</Button> 
+							</Button>
 
 
 						</form>

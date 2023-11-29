@@ -7,13 +7,13 @@ export default function privatePage({ children }) {
 	const user = localStorage.getItem("token")
 
 	if (user === null) {
-
-		return <Navigate to="/signin" />
+		return <Navigate to="/signin" />;
 	}
+
+
 	return (
 		<div>
 			{children}
 		</div>
-
-	)
+	);
 }

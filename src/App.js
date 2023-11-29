@@ -14,19 +14,17 @@ const App = () => {
 			<Routes>
 				<Route path='/' element={<PrivatePage>
 					<Dashboard />
+
+				</PrivatePage>}></Route>
+				<Route path='/resetPassword' element={<PrivatePage>
+					<ResetPassword />
+
 				</PrivatePage>}></Route>
 				<Route path='/Signin' element={<Signin />}></Route>
 				<Route path='/Signup' element={<Signup />} />
 				<Route path='/ForgotPassword' element={<ForgotPassword />} />
-				<Route path='/ResetPassword' element={<ResetPassword />} />
-
+				{/* <Route path='/ResetPassword' element={<ResetPassword />} /> */}
 			</Routes>
-
-
-
-
-			{/* <Dashboard></Dashboard> */}
-
 		</>
 	);
 }
