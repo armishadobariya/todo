@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import "./Dashboard.css";
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -23,6 +23,10 @@ import { checkBoxUrl } from './Api';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useNavigate } from 'react-router-dom';
 import ImageViewer from "react-simple-image-viewer";
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker, DateTimePickerToolbar } from '@mui/x-date-pickers/DateTimePicker';
 import { useDispatch, useSelector } from "react-redux";
 import {
 	addTodoData,
@@ -39,10 +43,12 @@ const Dashboard = () => {
 	const [image, setImage] = useState();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
+	const [date, setDate] = useState("");
 	const [updateTaskId, setUpdateTaskId] = useState(null);
 	const [updateTitle, setUpdateTitle] = useState("");
 	const [updateDescription, setUpdateDescription] = useState("");
 	const [updateIsComplated, setUpdateIsComplated] = useState("");
+	const [updateDate, setUpdateDate] = useState("");
 	const [isViewerOpen, setIsViewerOpen] = useState(false);
 	const [viewerImage, setViewerImage] = useState("");
 	const navigate = useNavigate();
@@ -92,12 +98,12 @@ const Dashboard = () => {
 
 
 	const addTodo = async (e) => {
-		addTodoData({ image, title, description })(dispatch);
+		addTodoData({ image, title, description, date })(dispatch);
 		setTitle("");
 		setDescription("");
 		setImage(null);
 		setShowForm(false);
-
+		setDate("");
 	};
 
 	const handleDeleteTask = async (taskId, token) => {
@@ -110,11 +116,13 @@ const Dashboard = () => {
 			title: updateTitle,
 			description: updateDescription,
 			isCompleted: updateIsComplated,
+			date: updateDate,
 		})(dispatch);
 		setUpdateTaskId(null);
 		setUpdateTitle("");
 		setUpdateDescription("");
 		setShowUpdate(false);
+		setUpdateDate("");
 	};
 
 	const checkBoxTodo = async (taskId, isCompleted) => {
@@ -129,12 +137,13 @@ const Dashboard = () => {
 	}
 
 
-	const toggleUpdate = (id, title, description, isCompleted) => {
+	const toggleUpdate = (id, title, description, isCompleted, date) => {
 		setUpdateTaskId(id)
 		setUpdateTitle(title);
 		setUpdateDescription(description);
 		setUpdateIsComplated(isCompleted);
 		setShowUpdate(!showUpdate);
+		setUpdateDate(date);
 	}
 
 	const Search = styled('div')(({ theme }) => ({
@@ -174,7 +183,7 @@ const Dashboard = () => {
 		},
 	}));
 	const current = new Date();
-	const date = `${current.getDate()}/${current.getMonth() + 1}/${current.getFullYear()}`
+	const datee = `${current.getDate()}/${current.getMonth() + 1}/${current.getFullYear()}`
 	return (
 		<>
 			<div className='nav'>
@@ -208,7 +217,7 @@ const Dashboard = () => {
 					<div className="dashboard_child">
 						<div className="title">
 							<h2>Today</h2>
-							<h6>{date}</h6>
+							<h6>{datee}</h6>
 							<div className="dashboard_view"><h4 ><ViewListIcon /></h4> <h3>view</h3></div>
 						</div>
 						<hr />
@@ -234,6 +243,7 @@ const Dashboard = () => {
 											<h4 className='displaytitle' onClick={() => openImageViewer(task.image)}>{task.title}</h4>
 											<br />
 											<h5>{task.description}</h5>
+											<h5>{task.date}</h5>
 											{task.image && (
 												<div onClick={() => openImageViewer(task.image)}>
 													<img src={task.image} alt="Task Image" className="task_image" />
@@ -242,7 +252,7 @@ const Dashboard = () => {
 											<EditCalendarOutlinedIcon
 												className="editicon"
 												style={{ justifyContent: "right", color: 'grey' }}
-												onClick={() => toggleUpdate(task.id, task.title, task.description)}
+												onClick={() => toggleUpdate(task.id, task.title, task.description, task.isCompleted, task.date)}
 											/>
 										</div>
 										<hr />
@@ -269,7 +279,16 @@ const Dashboard = () => {
 								<input type="text" className='task_description' placeholder='Description' value={updateDescription} onChange={(e) => { setUpdateDescription(e.target.value) }} /><br /> <br />
 								<div className="controls">
 									<LocalizationProvider dateAdapter={AdapterDayjs}>
-										<DatePicker sx={{ width: '180px', height: '20px' }} className="customDatePicker" />
+										<DemoContainer components={['DateTimePicker']}>
+											{/* <DateTimePicker hintText={updateDate} onChange={(e) => { setUpdateDate(e) }} /> */}
+											<DateTimePicker onChange={(e) => {
+												console.log(e);
+												const d = `${e.$y}-${(e.$M + 1).toString().padStart(2, '0')}-${e.$D.toString().padStart(2, '0')}T${e.$H.toString().padStart(2, '0')}:${e.$m.toString().padStart(2, '0')}:${e.$s.toString().padStart(2, '0')}Z`
+												console.log(d)
+
+												setUpdateDate(d)
+											}} />
+										</DemoContainer>
 									</LocalizationProvider>
 									<FormControl sx={{ marginLeft: "15px", minWidth: 10, borderRadius: '15px' }} className='dropdown'>
 										<Select
@@ -278,7 +297,7 @@ const Dashboard = () => {
 											displayEmpty
 											defaultValue='priority'
 											inputProps={{ 'aria-label': 'Without label' }}
-											style={{ height: '57px' }}
+											style={{ height: '55px', marginTop: "8px" }}
 										>
 											<MenuItem value="">
 												<h5 style={{ fontWeight: "300", color: "grey" }} ><OutlinedFlagIcon style={{ height: "18px" }} /> Priority</h5>
@@ -313,8 +332,18 @@ const Dashboard = () => {
 								<input type="text" className='task_name' placeholder='Task name' value={title} onChange={(e) => { setTitle(e.target.value) }} /><br /><br />
 								<input type="text" className='task_description' placeholder='Description' value={description} onChange={(e) => { setDescription(e.target.value) }} /><br /> <br />
 								<div className="controls">
+
 									<LocalizationProvider dateAdapter={AdapterDayjs}>
-										<DatePicker sx={{ width: '180px', height: '20px' }} className="customDatePicker" />
+										<DemoContainer components={['DateTimePicker']}>
+											{/* <DateTimePicker label="Date time Picker" onChange={(e) => { setDate(e) }} /> */}
+											<DateTimePicker onChange={(e) => {
+												console.log(e);
+												const d = `${e.$y}-${(e.$M + 1).toString().padStart(2, '0')}-${e.$D.toString().padStart(2, '0')}T${e.$H.toString().padStart(2, '0')}:${e.$m.toString().padStart(2, '0')}:${e.$s.toString().padStart(2, '0')}Z`
+												console.log(d)
+
+												setDate(d)
+											}} />
+										</DemoContainer>
 									</LocalizationProvider>
 									<FormControl sx={{ marginLeft: "15px", minWidth: 10, borderRadius: '15px' }} className='dropdown'>
 										<Select
@@ -323,7 +352,7 @@ const Dashboard = () => {
 											displayEmpty
 											defaultValue='priority'
 											inputProps={{ 'aria-label': 'Without label' }}
-											style={{ height: '57px' }}
+											style={{ height: '55px', marginTop: "8px", }}
 										>
 											<MenuItem value="">
 												<h5 style={{ fontWeight: "300", color: "grey" }} ><OutlinedFlagIcon style={{ height: "18px" }} /> Priority</h5>

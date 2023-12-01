@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getTaskUrl, insertTaskUrl, updateTaskUrl, deleteTaskUrl, checkBoxUrl } from '../../auth/Api';
+import { getTaskUrl, insertTaskUrl, updateTaskUrl, deleteTaskUrl, checkBoxUrl, } from '../../auth/Api';
 import { addTodo, setTodo, updateTodo, deleteTodo, checkTodo } from './todoSlice';
 
 export const addTodoData = (todoData) => async (dispatch) => {
@@ -9,12 +9,15 @@ export const addTodoData = (todoData) => async (dispatch) => {
 		formData.append('image', todoData.image);
 		formData.append('title', todoData.title);
 		formData.append('description', todoData.description);
+		formData.append('date', todoData.date);
+
+
 
 		const token = localStorage.getItem('token');
 
 		const response = await axios.post(insertTaskUrl, formData, {
 			headers: {
-				authorization: token,
+				authorization: `Bearer ${token}`,
 			},
 		});
 
@@ -32,7 +35,7 @@ export const getTodo = () => async (dispatch) => {
 		const token = localStorage.getItem('token');
 		const response = await axios.get(getTaskUrl, {
 			headers: {
-				authorization: token,
+				authorization: `Bearer ${token}`,
 			},
 		});
 
@@ -50,7 +53,7 @@ export const updateTodoData = (todoData) => async (dispatch) => {
 		const token = localStorage.getItem("token");
 		const response = await axios.put(updateTaskUrl, todoData, {
 			headers: {
-				authorization: token,
+				authorization: `Bearer ${token}`,
 			},
 		});
 		console.log("Task updated successfully:", response.data);
@@ -77,7 +80,7 @@ export const checkTodoData = ({ taskId, isCompleted }) => async (dispatch, getSt
 		};
 		const response = await axios.put(checkBoxUrl, checkdata, {
 			headers: {
-				authorization: token,
+				authorization: `Bearer ${token}`,
 			},
 		});
 		console.log('Checkbox API Response:', response.data);
@@ -90,7 +93,7 @@ export const deleteTodoData = ({ taskId, token }) => async (dispatch) => {
 	try {
 		const response = await axios.delete(deleteTaskUrl, {
 			headers: {
-				Authorization: token,
+				Authorization: `Bearer ${token}`,
 			},
 			data: {
 				id: taskId,

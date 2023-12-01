@@ -1,42 +1,42 @@
 @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500&family=Josefin+Slab:wght@500&family=Montserrat:wght@300&display=swap");
 
 
-*{
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-		font-family: 'Josefin Sans', sans-serif;
-  
-  
-	}
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Josefin Sans', sans-serif;
 
-	.main_header{
-		margin-left: 300px;
-		margin-top: 20px;
-		margin-right: 300px;
-		margin-bottom: -30px;
-		flex-direction: column;
-		display: flex;
-		
-	}
-	
 
-	.todo{
-		color: red;
-		margin-top: -10px;
-		margin-left: -5px;
-	}
+}
 
-	.mhead{
-		color: red;
-		display: flex;
-		flex-direction: column;
-		float: right;
-		margin-top: -57px;
-		
-	}
+.main_header {
+	margin-left: 300px;
+	margin-top: 20px;
+	margin-right: 300px;
+	margin-bottom: -30px;
+	flex-direction: column;
+	display: flex;
 
-.chead{
+}
+
+
+.todo {
+	color: red;
+	margin-top: -10px;
+	margin-left: -5px;
+}
+
+.mhead {
+	color: red;
+	display: flex;
+	flex-direction: column;
+	float: right;
+	margin-top: -57px;
+
+}
+
+.chead {
 	margin-left: 300px;
 	margin-top: 70px;
 	margin-bottom: -10px;
@@ -44,14 +44,14 @@
 	font-weight: bold;
 }
 
-.icon{
+.icon {
 	margin-left: 300px;
 	margin-top: 30px;
 	text-align: center;
 	color: black;
 }
 
-.google{
+.google {
 	border: 1px solid rgb(216, 216, 216);
 	height: 45px;
 	width: 350px;
@@ -62,101 +62,102 @@
 	margin-bottom: 15px;
 	margin-top: 8px;
 }
-.google img{
+
+.google img {
 
 	margin-left: 10px;
 	/* margin-top: 10px; */
 	/* margin-top: auto; */
-	
+
 }
 
-.google .go{
+.google .go {
 	font-size: 18px;
 	text-align: center;
 }
 
-.google:hover{
+.google:hover {
 	background-color: #e5e5e5;
 	cursor: pointer;
 }
 
 
-.face{
+.face {
 	font-size: 18px;
 	text-align: center;
-	
+
 }
 
 
-.app{
+.app {
 	font-size: 18px;
 	text-align: center;
-	
+
 }
 
-.line{
+.line {
 	border: 1px solid rgb(216, 216, 216);
-	width: 350px;	
+	width: 350px;
 	margin-top: 2px;
 	margin-bottom: 2px;
 }
 
-.inp_data{
+.inp_data {
 	margin-left: 320px;
 }
 
-.btn{
+.btn {
 	margin-left: 320px;
 	/* margin-top: 10px; */
 }
 
-.pra{
+.pra {
 	margin-left: 300px;
 	font-size: 12px;
 	margin-top: 10px;
 }
 
-.line1{
+.line1 {
 	border: 1px solid rgb(216, 216, 216);
 	width: 350px;
 	margin-top: 15px;
-	margin-bottom: 8px;	
+	margin-bottom: 8px;
 }
 
-.form{
+.form {
 	max-width: 1000px;
 }
 
-.footer p{
+.footer p {
 	text-align: center;
 	margin-top: 4px;
 	margin-left: 180px;
 	margin-bottom: 30px;
 }
 
-.pra a{
+.pra a {
 	color: black;
 }
 
-.video{
+.video {
 	height: 15px;
 	width: 15px;
 	margin-top: 90px;
 }
 
-.main{
+.main {
 	height: 100vh;
 	width: 100vw;
 	display: flex;
 }
 
-.msg div{
+.msg div {
 	margin-left: 630px;
 	width: 40%;
 	margin-top: 10px;
 }
 
-.login{
+.login {
 	color: rgb(43, 42, 42);
 }
 

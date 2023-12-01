@@ -1,8 +1,7 @@
 import React from 'react';
 import todo from "../images/Todoist_logo.png";
-import google from "../images/goo.png";
-import facebook from "../images/face.png";
-import apple from "../images/apple.png";
+import { LoginSocialFacebook } from "reactjs-social-login";
+import { FacebookLoginButton } from "react-social-login-buttons";
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -11,7 +10,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signUpUrl } from './Api';
-
+import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
@@ -41,7 +41,7 @@ const Signup = () => {
 	const [email, setEmail] = useState('');
 	const [pass, setPass] = useState('');
 	const [response, setResponse] = useState(null);
-	// const [emailError, setEmailError] = useState('');
+
 	const [passwordError, setPasswordError] = useState('');
 
 	const navigate = useNavigate();
@@ -58,10 +58,10 @@ const Signup = () => {
 	}
 
 	const validatePassword = (p) => {
-		// const minLength = 8;
+	
 
 		if (p.length < 8) {
-			// console.log("kgdsf", p.length);
+		
 			setPasswordError(`Password must be between 8 characters`);
 			return false;
 		}
@@ -82,7 +82,7 @@ const Signup = () => {
 					password: pass,
 				};
 				const response = await axios.post(signUpUrl, reqData);
-				// setResponse(alert("success", "Register Successfully ..."));
+			
 				console.log(response);
 				setResponse("success", 'success..');
 				setResponse(() => { navigate('/Signin') })
@@ -91,8 +91,7 @@ const Signup = () => {
 		}
 
 		catch (error) {
-			// console.error('Error:', error);
-			// setResponse("error", 'error..');
+		
 			setResponse(alert("error", 'Already register user...'));
 		}
 	};
@@ -121,15 +120,32 @@ const Signup = () => {
 						<form action="" >
 							<div className="icon">
 
-								<div className='google'>
-									<img src={google} alt="google image" height='30px' width='30px' /> <strong className='go' >  Continue with Google </strong>
-								</div>
-								<div className='google'>
-									<img src={facebook} alt="facebook image" height='20px' width='20px' style={{ marginRight: '7px' }} /> <strong className='face'>  Continue with Facebook</strong>
-								</div>
-								<div className='google'>
-									<img src={apple} alt="apple image" height='30px' width='30px' /><strong className='app'>  Continue with Apple</strong>
-								</div>
+								<GoogleOAuthProvider clientId="295805594505-bkc6q610hiqr9tgsa7ke28g6pepl6ta5.apps.googleusercontent.com">
+									<GoogleLogin
+										onSuccess={credentialResponse => {
+											console.log(credentialResponse);
+										}}
+										onError={() => {
+											console.log('Login Failed');
+										}}
+
+									/>
+								</GoogleOAuthProvider>
+
+								<LoginSocialFacebook
+									appId="654047430249892"
+									onResolve={(response) => {
+										console.log(response);
+
+									}}
+									onReject={(error) => {
+										console.log(error);
+									}}
+								>
+									<FacebookLoginButton style={{ width: '352px', marginLeft: '0px', marginBottom: '12px' }} />
+								</LoginSocialFacebook>
+
+
 								<hr className='line' />
 							</div>
 

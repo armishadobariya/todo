@@ -1,8 +1,7 @@
 import React from 'react';
 import todo from "../images/Todoist_logo.png";
-import google from "../images/goo.png";
-import facebook from "../images/face.png";
-import apple from "../images/apple.png";
+import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import TextField from '@mui/material/TextField';
 import { alpha, styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -12,9 +11,15 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInUrl } from './Api.jsx';
+import { googleLoginUrl } from './Api.jsx';
 
+
+import GoogleButton from 'react-google-button';
+import { LoginSocialFacebook } from "reactjs-social-login";
+import { FacebookLoginButton } from "react-social-login-buttons";
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { jwtDecode } from 'jwt-decode';
 const RedditTextField = styled((props) => (
 	<TextField InputProps={{ disableUnderline: true }} {...props} />
 ))
@@ -97,10 +102,7 @@ const Signin = () => {
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-	// const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-	// 	event.preventDefault();
-	// }
-
+	
 	return (
 		<>
 
@@ -108,9 +110,7 @@ const Signin = () => {
 				<div className="msg1">
 					{response && <div> {response}</div>}
 				</div>
-				{/* <div className="msg">
-					{response && <div>{response.message}</div>}
-				</div> */}
+				
 
 
 				<div className="div_1">
@@ -124,17 +124,41 @@ const Signin = () => {
 						<form action="">
 							<div className="log_icon">
 
-								<div className='log_google'>
-									{/* <GoogleIcon /> Continue with Google */}
-									<img src={google} alt="google image" height='30px' width='30px' /> <strong className='go' >  Continue with Google </strong>
-								</div>
-								<div className='log_google'>
-									<img src={facebook} alt="facebook image" height='20px' width='20px' style={{ marginRight: '7px' }} /> <strong className='face'>  Continue with Facebook</strong>
-								</div>
-								<div className='log_google'>
-									<img src={apple} alt="apple image" height='30px' width='30px' /><strong className='app'>  Continue with Apple</strong>
-								</div>
-								{/* <fieldset className='line' /> */}
+								<GoogleOAuthProvider clientId="295805594505-bkc6q610hiqr9tgsa7ke28g6pepl6ta5.apps.googleusercontent.com">
+									<GoogleLogin
+										onSuccess={async (credentialResponse) => {
+											console.log(credentialResponse);
+											const data = jwtDecode(credentialResponse.credential)
+											console.log(data)
+											// const token = credentialResponse.credential;
+											// const response = await axios.post(googleLoginUrl, {
+											// 	"token": token,
+											// }
+
+											// );
+
+										}}
+										onError={() => {
+											console.log('Login Failed');
+										}}
+
+									/>
+								</GoogleOAuthProvider>
+								<LoginSocialFacebook
+									appId="654047430249892"
+									onResolve={(response) => {
+										console.log(response);
+
+									}}
+									onReject={(error) => {
+										console.log(error);
+									}}
+								>
+									<FacebookLoginButton style={{ width: '379px', marginLeft: '0px', marginBottom: '12px' }} />
+								</LoginSocialFacebook>
+
+
+								
 								<hr className='log_line' />
 							</div>
 
