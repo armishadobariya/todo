@@ -29,19 +29,15 @@ const RedditTextField = styled((props) => (
 		},
 	}));
 
-
-
 const ForgotPassword = () => {
 
 	const [email, setEmail] = useState("");
 
 	const navigate = useNavigate();
-
 	const [otp, setOtp] = useState("");
 	const [response, setResponse] = useState(null);
 	const [showOtp, setShowOtp] = useState(false);
 	const [verifyEmail, setVerifyEmail] = useState(" ");
-
 
 	const VerifyOtp = async (e) => {
 		try {
@@ -58,23 +54,7 @@ const ForgotPassword = () => {
 			setResponse(error);
 			setResponse("error:", 'error');
 		}
-
 	};
-
-	// const ForgotPassword = async (e) => {
-	// 	try {
-	// 		e.preventDefault();
-	// 		const reqdata = {
-	// 			email: email,
-	// 		};
-	// 		const responseData = await axios.post(forgotPasswordUrl, reqdata);
-	// 		setResponse("success: ", responseData.data);
-	// 	}
-	// 	catch (error) {
-	// 		setResponse(error);
-	// 		setResponse("error:", 'error');
-	// 	}
-	// };
 
 	const toggleForm = () => {
 		setShowOtp(!showOtp);
@@ -89,9 +69,6 @@ const ForgotPassword = () => {
 			const responseData = await axios.post(forgotPasswordUrl, reqdata);
 			setVerifyEmail(responseData.data.message);
 			toggleForm();
-			// if (responseData.data.exists) {
-			// 	toggleForm(); // Open the form if the email exists
-			// }
 		} catch (error) {
 			setVerifyEmail("Email not found");
 		}
@@ -99,16 +76,10 @@ const ForgotPassword = () => {
 
 	return (
 		<div className="forgot_main">
-			{/* <div className="msg">
-				{response && <div> {response}</div>}
-
-			</div> */}
-
+			
 			<div className="msg">
 				{response && <div>{response.message}</div>}
 			</div>
-
-
 			<div className="col">
 				<div className="forgot_child">
 					<img src={todo} alt="" height='37px' width='140px' />
@@ -117,7 +88,6 @@ const ForgotPassword = () => {
 				<div className="content">
 					<h1>Forgote Your Password?</h1><br />
 					<p>To reset your password, please enter the your email address of your todoist account.</p><br /><br />
-
 					<RedditTextField
 						label="Email"
 						defaultValue=""
@@ -133,7 +103,6 @@ const ForgotPassword = () => {
 						}}
 						value={email}
 						onChange={(e) => { setEmail(e.target.value) }}
-
 					/>
 
 					<br />
@@ -151,8 +120,6 @@ const ForgotPassword = () => {
 						}} variant="contained" disableElevation onClick={checkEmailExists}>
 							Get OTP
 						</Button> <br /><br />
-
-
 					</div>
 					}
 
@@ -173,7 +140,6 @@ const ForgotPassword = () => {
 								}}
 								value={otp}
 								onChange={(e) => { setOtp(e.target.value) }}
-
 							/>
 							<br /><br />
 

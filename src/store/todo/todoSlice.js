@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { sortData } from './todoMethods';
 
 const initialState = {
 	todos: [],
+	copyTodos: [],
 };
 
 export const todoSlice = createSlice({
@@ -10,10 +12,17 @@ export const todoSlice = createSlice({
 	reducers: {
 		addTodo: (state, action) => {
 			state.todos.push(action.payload);
+			state.todos = sortData(state.todos)
 		},
 
+		setAllTodo: (state, action) => {
+			state.todos = state.copyTodos;
+		},
 		setTodo: (state, action) => {
-			state.todos = action.payload;
+			state.todos = action.payload.data;
+			if (action.payload.isFirst) {
+				state.copyTodos = action.payload.data;
+			}
 		},
 		updateTodo: (state, action) => {
 			state.todos = state.todos.map((todo) => {
@@ -22,6 +31,7 @@ export const todoSlice = createSlice({
 				}
 				return todo;
 			})
+			state.todos = sortData(state.todos)
 		},
 		deleteTodo: (state, action) => {
 			state.todos = state.todos.filter((todo) => todo.id !== action.payload);
@@ -38,9 +48,10 @@ export const todoSlice = createSlice({
 				return todo;
 			});
 		},
+
 	},
 })
 
-export const { addTodo, setTodo, updateTodo, deleteTodo, checkTodo } = todoSlice.actions;
+export const { addTodo, setTodo, updateTodo, deleteTodo, checkTodo, setAllTodo } = todoSlice.actions;
 
 export default todoSlice.reducer;

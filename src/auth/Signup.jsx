@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { signUpUrl } from './Api';
 import { GoogleLogin } from '@react-oauth/google';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
+import { googleLoginUrl } from './Api.jsx';
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
@@ -34,7 +36,6 @@ const RedditTextField = styled((props) => (
 		},
 	}));
 
-
 const Signup = () => {
 
 	const [name, setName] = useState('');
@@ -56,12 +57,11 @@ const Signup = () => {
 			</div>
 		);
 	}
-
 	const validatePassword = (p) => {
-	
+
 
 		if (p.length < 8) {
-		
+
 			setPasswordError(`Password must be between 8 characters`);
 			return false;
 		}
@@ -82,7 +82,7 @@ const Signup = () => {
 					password: pass,
 				};
 				const response = await axios.post(signUpUrl, reqData);
-			
+
 				console.log(response);
 				setResponse("success", 'success..');
 				setResponse(() => { navigate('/Signin') })
@@ -91,25 +91,17 @@ const Signup = () => {
 		}
 
 		catch (error) {
-		
+
 			setResponse(alert("error", 'Already register user...'));
 		}
 	};
-
-
-
-
-
 	return (
 		<>
 			<div className="msg">
 				{response && <div> {response}</div>}
 			</div>
 			<div className="main" >
-
 				<div className="div_1">
-
-
 					<div className="main_header">
 						<img src={todo} alt="logo" height="37px" width="140px" />
 					</div>
@@ -119,11 +111,29 @@ const Signup = () => {
 					<div className="form">
 						<form action="" >
 							<div className="icon">
-
-								<GoogleOAuthProvider clientId="295805594505-bkc6q610hiqr9tgsa7ke28g6pepl6ta5.apps.googleusercontent.com">
+								<GoogleOAuthProvider clientId="295805594505-sq8l6g2m1dlgnlepvim7h03gmo48gco3.apps.googleusercontent.com">
 									<GoogleLogin
-										onSuccess={credentialResponse => {
-											console.log(credentialResponse);
+										onSuccess={async (credentialResponse) => {
+											try {
+												console.log(credentialResponse);
+												const data = jwtDecode(credentialResponse.credential)
+												console.log(data)
+
+												const token = credentialResponse.credential;
+												const response = await axios.post(googleLoginUrl, {
+													"token": token,
+												});
+
+												if (response.status === 200) {
+
+													const { token } = response.data;
+													localStorage.setItem("token", token);
+													navigate("/");
+												}
+												console.log('Google Login Response:', response.data);
+											} catch (error) {
+												console.error('Error:', error.message);
+											}
 										}}
 										onError={() => {
 											console.log('Login Failed');
@@ -148,8 +158,6 @@ const Signup = () => {
 
 								<hr className='line' />
 							</div>
-
-
 							<div className="inp_data">
 								<div>
 									<RedditTextField
@@ -164,10 +172,7 @@ const Signup = () => {
 										}}
 										value={name}
 										onChange={(e) => { setName(e.target.value) }}
-
 									/>
-
-
 								</div>
 								<div>
 									<RedditTextField

@@ -11,3 +11,6 @@ export const updateTaskUrl = `${baseUrl}/update-task`;
 export const deleteTaskUrl = `${baseUrl}/delete-task`;
 export const checkBoxUrl = `${baseUrl}/check-box`;
 export const googleLoginUrl = `${baseUrl}/google-login`;
+export const deleteAccountUrl = `${baseUrl}/delete-user`;
+export const searchTaskUrl = `${baseUrl}/search-task`;
+export const userDataUrl = `${baseUrl}/user-data`;

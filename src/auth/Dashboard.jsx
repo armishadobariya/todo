@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import "./Dashboard.css";
 import ViewListIcon from '@mui/icons-material/ViewList';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -19,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
-import { checkBoxUrl } from './Api';
+import { checkBoxUrl, deleteAccountUrl, searchTaskUrl, userDataUrl } from './Api';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useNavigate } from 'react-router-dom';
 import ImageViewer from "react-simple-image-viewer";
@@ -28,13 +27,54 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker, DateTimePickerToolbar } from '@mui/x-date-pickers/DateTimePicker';
 import { useDispatch, useSelector } from "react-redux";
+import CancelIcon from '@mui/icons-material/Cancel';
 import {
 	addTodoData,
 	deleteTodoData,
 	getTodo,
 	updateTodoData,
 	checkTodoData,
+	searchTodoData,
 } from "../store/todo/todoMethods";
+// import DeleteIcon from '@mui/icons-material/Delete';
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+	color: 'inherit',
+	'& .MuiInputBase-input': {
+		padding: theme.spacing(1, 1, 1, 0),
+		paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+		transition: theme.transitions.create('width'),
+		width: '100%',
+		[theme.breakpoints.up('md')]: {
+			width: '20ch',
+		},
+	},
+}));
+const Search = styled('div')(({ theme }) => ({
+	position: 'relative',
+	borderRadius: theme.shape.borderRadius,
+	backgroundColor: alpha(theme.palette.common.white, 0.15),
+	'&:hover': {
+		backgroundColor: alpha(theme.palette.common.white, 0.25),
+	},
+	marginRight: theme.spacing(2),
+	marginLeft: 0,
+	width: '100%',
+	[theme.breakpoints.up('sm')]: {
+		marginLeft: theme.spacing(3),
+		width: 'auto',
+	},
+}));
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+	padding: theme.spacing(0, 2),
+	height: '100%',
+	position: 'absolute',
+	pointerEvents: 'none',
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+}));
+
 
 const Dashboard = () => {
 	const [age, setAge] = useState('');
@@ -51,16 +91,21 @@ const Dashboard = () => {
 	const [updateDate, setUpdateDate] = useState("");
 	const [isViewerOpen, setIsViewerOpen] = useState(false);
 	const [viewerImage, setViewerImage] = useState("");
+	const [showProfile, setShowProfile] = useState(false);
+	const [userName, setUserName] = useState(false);
+	const [userEmail, setUserEmail] = useState(false);
+	const [userImage, setUserImage] = useState(false);
+	// const [search, setSearch] = useState("");
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
+	const location = useLocation();
 	let tasks = useSelector((state) => state.todo.todos);
+
+
 
 	const handleImageChange = (event) => {
 		setImage(event.target.files[0]);
 	};
-
-	// Remain pervious task.
 
 	useEffect(() => {
 		getTodo()(dispatch);
@@ -75,27 +120,6 @@ const Dashboard = () => {
 		localStorage.removeItem('token');
 		navigate("/Signin");
 	}
-
-	// display all task 
-
-	// const getTodo = async (token) => {
-	// 	try {
-	// 		const getTaskResponse = await axios.get(getTaskUrl, {
-	// 			headers: {
-	// 				authorization: token,
-	// 			},
-	// 		});
-	// 		console.log("Get Task Response:", getTaskResponse.data);
-	// 		const result = getTaskResponse.data;
-	// 		setState(result.data);
-	// 	} catch (error) {
-	// 		console.error('Error:', error.message);
-	// 	}
-
-	// }
-
-	const [state, setState] = useState([]);
-
 
 	const addTodo = async (e) => {
 		addTodoData({ image, title, description, date })(dispatch);
@@ -126,8 +150,49 @@ const Dashboard = () => {
 	};
 
 	const checkBoxTodo = async (taskId, isCompleted) => {
-		dispatch(checkTodoData({ taskId, isCompleted }));
+		checkTodoData({ taskId, isCompleted })(dispatch);
 	}
+
+
+
+	const deleteAccount = async (token) => {
+		try {
+			const response = await axios.delete(deleteAccountUrl, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+
+			});
+			if (response.status === 200) {
+				console.log('success');
+				navigate("/Signin");
+			}
+		} catch (error) {
+			console.error("Error deleting user:", error.message);
+		}
+	}
+	const searchTask = async (search) => {
+		searchTodoData({ search })(dispatch);
+	}
+	// const searchTask = async (search) => {
+	// 	if (search === undefined || search === null || search === "") {
+	// 		return getTodo()(dispatch);
+	// 	}
+	// 	try {
+	// 		const token = localStorage.getItem("token")
+	// 		const response = await axios.get(`${searchTaskUrl}/${search}`, {
+	// 			headers: {
+	// 				Authorization: `Bearer ${token}`,
+	// 			},
+	// 		});
+	// 		if (response.status === 200) {
+	// 			dispatch(setTodo(response.data.data));
+
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Error deleting user:", error.message);
+	// 	}
+	// }
 
 	const handleChange = (event) => {
 		setAge(event.target.value);
@@ -146,49 +211,45 @@ const Dashboard = () => {
 		setUpdateDate(date);
 	}
 
-	const Search = styled('div')(({ theme }) => ({
-		position: 'relative',
-		borderRadius: theme.shape.borderRadius,
-		backgroundColor: alpha(theme.palette.common.white, 0.15),
-		'&:hover': {
-			backgroundColor: alpha(theme.palette.common.white, 0.25),
-		},
-		marginRight: theme.spacing(2),
-		marginLeft: 0,
-		width: '100%',
-		[theme.breakpoints.up('sm')]: {
-			marginLeft: theme.spacing(3),
-			width: 'auto',
-		},
-	}));
-	const SearchIconWrapper = styled('div')(({ theme }) => ({
-		padding: theme.spacing(0, 2),
-		height: '100%',
-		position: 'absolute',
-		pointerEvents: 'none',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-	}));
-	const StyledInputBase = styled(InputBase)(({ theme }) => ({
-		color: 'inherit',
-		'& .MuiInputBase-input': {
-			padding: theme.spacing(1, 1, 1, 0),
-			paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-			transition: theme.transitions.create('width'),
-			width: '100%',
-			[theme.breakpoints.up('md')]: {
-				width: '20ch',
-			},
-		},
-	}));
+	const getUserData = async () => {
+		try {
+			const token = localStorage.getItem('token');
+			const response = await axios.get(userDataUrl, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+
+			});
+			if (response.status === 200) {
+				console.log('success');
+				const data = response.data.data;
+				setUserName(data.name);
+				setUserImage(data.image);
+				setUserEmail(data.email);
+			}
+		} catch (error) {
+			console.error("fetch user data:", error.message);
+		}
+	}
+
+	const displayProfile = () => {
+		setShowProfile(!showProfile);
+		getUserData();
+
+	}
+
+
+
+	const email = location.state;
+	console.log(email);
 	const current = new Date();
 	const datee = `${current.getDate()}/${current.getMonth() + 1}/${current.getFullYear()}`
 	return (
 		<>
 			<div className='nav'>
 				<div className="front">
-					<MenuIcon style={{ height: "45px", width: "40px", marginLeft: "30px", color: "white", cursor: 'pointer' }} />
+					<MenuIcon style={{ height: "45px", width: "40px", marginLeft: "30px", color: "white", cursor: 'pointer' }} onClick={displayProfile} />
+
 					<HomeIcon style={{ height: "45px", width: "40px", marginLeft: "15px", color: "white", cursor: 'pointer' }}></HomeIcon>
 					<Search style={{ maxWidth: "230px", marginLeft: "135px", cursor: 'pointer' }}>
 						<SearchIconWrapper >
@@ -205,14 +266,34 @@ const Dashboard = () => {
 								height: '35px',
 								cursor: 'pointer'
 							}}
+							onChange={(e) => {
+								searchTask(e.target.value)
+							}}
 						/>
 					</Search>
 					<AddIcon style={{ marginLeft: "1415px", marginBottom: '30px', marginTop: '-35px', color: "white", width: "50px", fontSize: '32px', cursor: 'pointer' }} onClick={toggleForm} />
 					<PowerSettingsNewIcon style={{ color: 'white', fontSize: '32px', cursor: 'pointer', float: 'right', marginTop: '-60px', marginLeft: '1200px', marginRight: '20px' }} onClick={logOut} />
+					{showProfile && (
+						<div className='profile_display'>
+							<div className="close">
+								<CancelIcon className='close_profile' onClick={displayProfile} />
+							</div>
+							<div className="email_profile">
+								<h6>{userEmail}</h6>
+							</div>
+
+							<div className="image_profile">
+								<img src={userImage} alt="User_Profile" />
+							</div>
+							<h3>Hi,{userName} !</h3>
+							<div className="delete_profile">
+								<button className='btn_profile' onClick={() => deleteAccount(localStorage.getItem("token"))}> Delete A/C</button>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 			<center>
-
 				<div className='dashboad_main'>
 					<div className="dashboard_child">
 						<div className="title">
@@ -221,7 +302,6 @@ const Dashboard = () => {
 							<div className="dashboard_view"><h4 ><ViewListIcon /></h4> <h3>view</h3></div>
 						</div>
 						<hr />
-
 						<div className="tasks-list"><br />
 							<h5>Todos :</h5>
 							<ul style={{ listStyleType: "none" }}>
@@ -259,7 +339,6 @@ const Dashboard = () => {
 										<br />
 									</li>
 								))}
-
 								{isViewerOpen && (
 									<ImageViewer
 										src={[viewerImage]}
@@ -271,7 +350,6 @@ const Dashboard = () => {
 								)}
 							</ul>
 						</div>
-
 						{showUpdate && (
 							<div className="dashboard_box" style={{ marginLeft: "2px" }}>
 
@@ -285,7 +363,6 @@ const Dashboard = () => {
 												console.log(e);
 												const d = `${e.$y}-${(e.$M + 1).toString().padStart(2, '0')}-${e.$D.toString().padStart(2, '0')}T${e.$H.toString().padStart(2, '0')}:${e.$m.toString().padStart(2, '0')}:${e.$s.toString().padStart(2, '0')}Z`
 												console.log(d)
-
 												setUpdateDate(d)
 											}} />
 										</DemoContainer>

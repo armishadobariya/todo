@@ -1,6 +1,13 @@
 import axios from 'axios';
-import { getTaskUrl, insertTaskUrl, updateTaskUrl, deleteTaskUrl, checkBoxUrl, } from '../../auth/Api';
-import { addTodo, setTodo, updateTodo, deleteTodo, checkTodo } from './todoSlice';
+import { getTaskUrl, insertTaskUrl, updateTaskUrl, deleteTaskUrl, checkBoxUrl, searchTaskUrl } from '../../auth/Api';
+import { addTodo, setTodo, updateTodo, deleteTodo, checkTodo, setAllTodo } from './todoSlice';
+
+export const sortData = (data) => {
+	const compareDates = (a, b) => new Date(b.date) - new Date(a.date);
+	const sortedData = data.sort(compareDates);
+	return sortedData;
+}
+
 
 export const addTodoData = (todoData) => async (dispatch) => {
 	try {
@@ -40,8 +47,7 @@ export const getTodo = () => async (dispatch) => {
 		});
 
 		if (response.status === 200) {
-			dispatch(setTodo(response.data.data));
-			console.log('Get Task Response:', response.data.data);
+			dispatch(setTodo({ data: response.data.data, isFirst: true }));
 		}
 	} catch (error) {
 		console.error('Error:', error.message);
@@ -68,11 +74,10 @@ export const updateTodoData = (todoData) => async (dispatch) => {
 }
 
 
-export const checkTodoData = ({ taskId, isCompleted }) => async (dispatch, getState) => {
+export const checkTodoData = ({ taskId, isCompleted }) => async (dispatch) => {
 	try {
 		const token = localStorage.getItem("token");
 
-		// const currentTodos = getState().todo.todos;
 		dispatch(checkTodo({ id: taskId, isCompleted: !isCompleted }));
 		const checkdata = {
 			id: taskId,
@@ -88,6 +93,27 @@ export const checkTodoData = ({ taskId, isCompleted }) => async (dispatch, getSt
 		console.error('Error updating checkbox:', error.message);
 	}
 };
+
+export const searchTodoData = ({ search }) => async (dispatch) => {
+	if (search === undefined || search === null || search === "") {
+		dispatch(setAllTodo())
+		return;
+	}
+	try {
+		const token = localStorage.getItem("token")
+		const response = await axios.get(`${searchTaskUrl}/${search}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (response.status === 200) {
+			dispatch(setTodo({ data: response.data.data, isFirst: false }));
+
+		}
+	} catch (error) {
+		console.error("No Data Search", error.message);
+	}
+}
 
 export const deleteTodoData = ({ taskId, token }) => async (dispatch) => {
 	try {

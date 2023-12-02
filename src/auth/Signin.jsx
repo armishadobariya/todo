@@ -12,8 +12,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInUrl } from './Api.jsx';
 import { googleLoginUrl } from './Api.jsx';
-
-
 import GoogleButton from 'react-google-button';
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { FacebookLoginButton } from "react-social-login-buttons";
@@ -39,11 +37,8 @@ const RedditTextField = styled((props) => (
 		},
 	}));
 
-
-
 const Signin = () => {
 	const navigate = useNavigate();
-
 
 	const [email, setEmail] = useState("");
 	const [pass, setPass] = useState("");
@@ -73,36 +68,20 @@ const Signin = () => {
 
 				const { token } = responseData.data;
 				localStorage.setItem("token", token);
-				// setResponse(alert("success", "Register Successfully ..."));
-				navigate("/");
-
+				navigate("/", { state: email });
 			}
-			// if (!responseData.data.email.exists) {
-			// 	setVerificationResult('email not exists');
-			// }
-			// else if (!responseData.data.password.exists) {
-			// 	setVerificationResult('password not exists');
-			// }
-			// else {
-			// 	setVerificationResult('Data Exists');
-			// }
+			
 		}
 		catch (error) {
 			setResponse(alert("error", 'Email or Password not exists'));
-			// setVerificationResult('123');
 		}
-
 	};
 
+	// const [showPassword, setShowPassword] = React.useState(false);
+
+	// const handleClickShowPassword = () => setShowPassword((show) => !show);
 
 
-
-
-	const [showPassword, setShowPassword] = React.useState(false);
-
-	const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-	
 	return (
 		<>
 
@@ -110,9 +89,6 @@ const Signin = () => {
 				<div className="msg1">
 					{response && <div> {response}</div>}
 				</div>
-				
-
-
 				<div className="div_1">
 					<div className="log_header">
 						<img src={todo} alt="logo" height="37px" width="140px" />
@@ -123,25 +99,35 @@ const Signin = () => {
 					<div className="form">
 						<form action="">
 							<div className="log_icon">
-
-								<GoogleOAuthProvider clientId="295805594505-bkc6q610hiqr9tgsa7ke28g6pepl6ta5.apps.googleusercontent.com">
+								<GoogleOAuthProvider clientId="295805594505-sq8l6g2m1dlgnlepvim7h03gmo48gco3.apps.googleusercontent.com">
 									<GoogleLogin
 										onSuccess={async (credentialResponse) => {
-											console.log(credentialResponse);
-											const data = jwtDecode(credentialResponse.credential)
-											console.log(data)
-											// const token = credentialResponse.credential;
-											// const response = await axios.post(googleLoginUrl, {
-											// 	"token": token,
-											// }
+											try {
+												console.log(credentialResponse);
+												const data = jwtDecode(credentialResponse.credential)
+												console.log(data)
 
-											// );
+												const token = credentialResponse.credential;
+												const response = await axios.post(googleLoginUrl, {
+													"token": token,
+												});
 
+												if (response.status === 200) {
+
+													const { token } = response.data;
+													localStorage.setItem("token", token);
+													navigate("/");
+												}
+
+												console.log('Google Login Response:', response.data);
+
+											} catch (error) {
+												console.error('Error:', error.message);
+											}
 										}}
 										onError={() => {
 											console.log('Login Failed');
 										}}
-
 									/>
 								</GoogleOAuthProvider>
 								<LoginSocialFacebook
@@ -156,15 +142,10 @@ const Signin = () => {
 								>
 									<FacebookLoginButton style={{ width: '379px', marginLeft: '0px', marginBottom: '12px' }} />
 								</LoginSocialFacebook>
-
-
-								
 								<hr className='log_line' />
 							</div>
 
-
 							<div className="inp_data">
-
 								<div>
 									<RedditTextField
 										label="Email"
@@ -178,7 +159,6 @@ const Signin = () => {
 										}}
 										value={email}
 										onChange={(e) => { setEmail(e.target.value) }}
-
 									/>
 								</div>
 								<h1>{verificationResult}</h1>
@@ -197,7 +177,6 @@ const Signin = () => {
 										value={pass}
 										onChange={(e) => { setPass(e.target.value) }}
 									/>
-
 								</div>
 							</div>
 							<div className='btn'>
@@ -210,8 +189,6 @@ const Signin = () => {
 									height: '52px',
 									marginBottom: '13px',
 									marginLeft: '-14px'
-
-
 								}} variant="contained" disableElevation onClick={LoginUser}>
 									Log in
 								</Button> <br /><br />
@@ -225,14 +202,12 @@ const Signin = () => {
 								</p>
 								<a href='Terms of Service'>Terms of Service</a> and <a href='Privacy Policy'>Privacy Policy</a><p>.</p><br />
 								<hr className='line2' />
-
 							</div>
 							<div>
 							</div>
 							<div className='footer1'>
 								<p>Don't have an account? <a href="/Signup" className='login'>Sign Up</a></p>
 							</div>
-
 						</form>
 					</div>
 				</div>
