@@ -260,14 +260,105 @@ align-items: center;
 margin-top: 20px;
 }
 
-.profile_display h3{
+.profile_display h5{
 	justify-content: center;
 	text-align: center;
 	margin-top: 10px;
 	font-weight: bold;
 }
-/* .btn_profile:hover{
+.modal_header1 .modal-title1{
+    color:#dc4c3e;
+}
+.btn_delete_yes{
+   background-color: #dc4c3e;
+   outline: none;
+   border: none;
+   color: white;
+  border-radius: 5px;
+  height: 40px;
+  width: 70px;
+  margin-top: 10px;
+ margin-left: 10px;
+ margin-right: 20px;
+}
+.btn-secondary{
+    margin-bottom: 10px;
+    height: 40px;
+    width: 70px;
+	margin-left: 250px;
+}
+.model_password{
+    height: 45px;
+    width: 100%;
+    border-radius: 8px;
+    border: 2px solid rgb(236, 231, 231);
+    outline: 2px solid rgb(236, 231, 231);
+    color:rgb(53, 48, 48) ;
+    padding-left: 10px;
+}
+.modal-title1{
+	display: flex;
+}
+
+.modal-dialog{
+	width: 420px;
+}
+.edit_img{
+	background-color: #3808e4;
+   outline: none;
+   border: none;
+   color: white;
+  border-radius: 5px;
+  height: 40px;
+  width: 70px;
+  margin-top: -40px;
+  margin-right: 30px;
+}
+
+.modal-header{
+	margin-top: 7px;
+	margin-bottom: 10px;
+}
+
+.modal-header1{
+	display: flex;
+}
+
+.modal-header1 button{
+	margin-top: 10px;
+	margin-left: 185px;
+}
+
+
+.modal-header img{
+	height: 30px;
+	width: 120px;
+	border-radius: 2px;
 	background-color: white;
-	border: 1px solid #dc4c3e;
-	color: #dc4c3e;
-} */
+	margin-top: -5px;
+}
+
+.modal-header .modal-title{
+	color: black;
+	margin-top: -1px;
+}
+
+.modal_footer{
+	display: flex;
+	margin-top: 40px;
+   
+}
+.modal{
+	height: 100%;
+}
+.modal_footer input{
+	margin-bottom: 30px;
+	margin-left: 50px;
+	margin-top: -30px;
+}
+
+.footer{
+	display: flex;
+
+}
+

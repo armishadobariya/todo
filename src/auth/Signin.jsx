@@ -45,16 +45,16 @@ const Signin = () => {
 	const [response, setResponse] = useState(null);
 	const [verificationResult, setVerificationResult] = useState('');
 
-	function alert(type, msg) {
-		const bs_class = (type === "success") ? "alert-success" : "alert-danger";
+	// function alert(type, msg) {
+	// 	const bs_class = (type === "success") ? "alert-success" : "alert-danger";
 
-		return (
-			<div className={`alert ${bs_class} alert-dismissible fade show custom-alert`} role="alert">
-				<strong className="me-3">{msg}</strong>
-				<button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		);
-	}
+	// 	return (
+	// 		<div className={`alert ${bs_class} alert-dismissible fade show custom-alert`} role="alert">
+	// 			<strong className="me-3">{msg}</strong>
+	// 			<button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	// 		</div>
+	// 	);
+	// }
 
 	const LoginUser = async (e) => {
 		try {
@@ -70,17 +70,28 @@ const Signin = () => {
 				localStorage.setItem("token", token);
 				navigate("/", { state: email });
 			}
-			
+
 		}
 		catch (error) {
-			setResponse(alert("error", 'Email or Password not exists'));
+
+			setResponse(alert(error.response.data.message));
+
+			// setResponse(alert("error", 'Email or Password not exists'));
 		}
 	};
 
 	// const [showPassword, setShowPassword] = React.useState(false);
 
 	// const handleClickShowPassword = () => setShowPassword((show) => !show);
+	const handleKeyDown = (event) => {
+		console.log("clicked");
 
+		if (event.key === 'Enter') {
+			console.log("enter clicked");
+			LoginUser(event);
+
+		};
+	}
 
 	return (
 		<>
@@ -130,7 +141,7 @@ const Signin = () => {
 										}}
 									/>
 								</GoogleOAuthProvider>
-								<LoginSocialFacebook
+								{/* <LoginSocialFacebook
 									appId="654047430249892"
 									onResolve={(response) => {
 										console.log(response);
@@ -141,7 +152,7 @@ const Signin = () => {
 									}}
 								>
 									<FacebookLoginButton style={{ width: '379px', marginLeft: '0px', marginBottom: '12px' }} />
-								</LoginSocialFacebook>
+								</LoginSocialFacebook> */}
 								<hr className='log_line' />
 							</div>
 
@@ -175,6 +186,7 @@ const Signin = () => {
 											style: { color: 'black' }
 										}}
 										value={pass}
+										onKeyDown={handleKeyDown}
 										onChange={(e) => { setPass(e.target.value) }}
 									/>
 								</div>

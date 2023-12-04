@@ -16,10 +16,7 @@ const App = () => {
 					<Dashboard />
 
 				</PrivatePage>}></Route>
-				<Route path='/resetPassword' element={<PrivatePage>
-					<ResetPassword />
-
-				</PrivatePage>}></Route>
+				<Route path='/resetPassword' element={<ResetPassword />}></Route>
 				<Route path='/Signin' element={<Signin />}></Route>
 				<Route path='/Signup' element={<Signup />} />
 				<Route path='/ForgotPassword' element={<ForgotPassword />} />

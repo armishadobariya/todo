@@ -24,7 +24,7 @@ export const addTodoData = (todoData) => async (dispatch) => {
 
 		const response = await axios.post(insertTaskUrl, formData, {
 			headers: {
-				authorization: `Bearer ${token}`,
+				authorization: ` Bearer ${token}`,
 			},
 		});
 
@@ -42,12 +42,12 @@ export const getTodo = () => async (dispatch) => {
 		const token = localStorage.getItem('token');
 		const response = await axios.get(getTaskUrl, {
 			headers: {
-				authorization: `Bearer ${token}`,
+				authorization: ` Bearer ${token}`,
 			},
 		});
 
 		if (response.status === 200) {
-			dispatch(setTodo({ data: response.data.data, isFirst: true }));
+			dispatch(setTodo({ data: response.data.data }));
 		}
 	} catch (error) {
 		console.error('Error:', error.message);
@@ -95,19 +95,16 @@ export const checkTodoData = ({ taskId, isCompleted }) => async (dispatch) => {
 };
 
 export const searchTodoData = ({ search }) => async (dispatch) => {
-	if (search === undefined || search === null || search === "") {
-		dispatch(setAllTodo())
-		return;
-	}
+
 	try {
 		const token = localStorage.getItem("token")
-		const response = await axios.get(`${searchTaskUrl}/${search}`, {
+		const response = await axios.get(`${getTaskUrl}/${search}`, {
 			headers: {
-				Authorization: `Bearer ${token}`,
+				Authorization: ` Bearer ${token}`,
 			},
 		});
 		if (response.status === 200) {
-			dispatch(setTodo({ data: response.data.data, isFirst: false }));
+			dispatch(setTodo({ data: response.data.data }));
 
 		}
 	} catch (error) {
@@ -132,4 +129,3 @@ export const deleteTodoData = ({ taskId, token }) => async (dispatch) => {
 		console.error("Error deleting task:", error.message);
 	}
 }
-

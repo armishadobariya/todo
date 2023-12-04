@@ -18,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
-import { checkBoxUrl, deleteAccountUrl, searchTaskUrl, userDataUrl } from './Api';
+import { checkBoxUrl, deleteAccountUrl, searchTaskUrl, userDataUrl, changeProfileUrl } from './Api';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useNavigate } from 'react-router-dom';
 import ImageViewer from "react-simple-image-viewer";
@@ -36,6 +36,11 @@ import {
 	checkTodoData,
 	searchTodoData,
 } from "../store/todo/todoMethods";
+import EditIcon from '@mui/icons-material/Edit';
+import todo from "../images/Todoist_logo.png";
+// import CancelIcon from '@mui/icons-material/Cancel';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -94,17 +99,26 @@ const Dashboard = () => {
 	const [showProfile, setShowProfile] = useState(false);
 	const [userName, setUserName] = useState(false);
 	const [userEmail, setUserEmail] = useState(false);
-	const [userImage, setUserImage] = useState(false);
+	const [userImage, setUserImage] = useState({ image: null, isSet: false });
+	const [changeImage, setChangeImage] = useState("");
+	const [deletePassword, setDeletePassword] = useState("");
 	// const [search, setSearch] = useState("");
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const location = useLocation();
 	let tasks = useSelector((state) => state.todo.todos);
 
-
-
 	const handleImageChange = (event) => {
 		setImage(event.target.files[0]);
+	};
+	const handleImageChange1 = (e) => {
+		const selectedImage = e.target.files[0];
+		const imageUrl = URL.createObjectURL(selectedImage);
+		setUserImage(pre => {
+			return {
+				image: selectedImage, isSet: true
+			}
+		});
 	};
 
 	useEffect(() => {
@@ -153,24 +167,30 @@ const Dashboard = () => {
 		checkTodoData({ taskId, isCompleted })(dispatch);
 	}
 
-
-
-	const deleteAccount = async (token) => {
+	const deleteAccount = async (token, deletePassword) => {
 		try {
+			const deleteData = {
+				password: deletePassword,
+			};
 			const response = await axios.delete(deleteAccountUrl, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
-
+				data: deleteData
 			});
 			if (response.status === 200) {
 				console.log('success');
+				localStorage.removeItem('token');
 				navigate("/Signin");
 			}
 		} catch (error) {
-			console.error("Error deleting user:", error.message);
+			// console.error("Error deleting user:", error.message);
+			alert(error.response.data.message);
+
 		}
 	}
+
+
 	const searchTask = async (search) => {
 		searchTodoData({ search })(dispatch);
 	}
@@ -194,6 +214,38 @@ const Dashboard = () => {
 	// 	}
 	// }
 
+	const editImage = async (e) => {
+		try {
+			e.preventDefault();
+			const formData = new FormData();
+
+			formData.append('image', userImage.image);
+
+
+			const token = localStorage.getItem('token');
+			const response = await axios.post(changeProfileUrl, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+					Authorization: `Bearer ${token}`,
+				},
+
+			});
+			if (response.status === 200) {
+				console.log('success');
+				const data = response.data.data;
+				console.log(data);
+				setUserImage(pre => {
+					return {
+						image: data.image, isSet: false
+					}
+				});
+
+			}
+		} catch (error) {
+			console.error("fetch user data:", error.message);
+		}
+	}
+
 	const handleChange = (event) => {
 		setAge(event.target.value);
 	}
@@ -211,6 +263,10 @@ const Dashboard = () => {
 		setUpdateDate(date);
 	}
 
+	// const toggleEdit = () => {
+	// 	setShowProfile(!showProfile);
+	// }
+
 	const getUserData = async () => {
 		try {
 			const token = localStorage.getItem('token');
@@ -224,7 +280,13 @@ const Dashboard = () => {
 				console.log('success');
 				const data = response.data.data;
 				setUserName(data.name);
-				setUserImage(data.image);
+				setUserImage((pre) => {
+					const image = {
+						image: data.image, isSet: false,
+					};
+					return image
+				});
+
 				setUserEmail(data.email);
 			}
 		} catch (error) {
@@ -235,9 +297,18 @@ const Dashboard = () => {
 	const displayProfile = () => {
 		setShowProfile(!showProfile);
 		getUserData();
-
 	}
 
+	const handleKeyDown = (event) => {
+		console.log("clicked");
+		const token = localStorage.getItem('token');
+
+		if (event.key === 'Enter') {
+			console.log("enter clicked");
+			deleteAccount(token, deletePassword);
+
+		};
+	}
 
 
 	const email = location.state;
@@ -283,11 +354,75 @@ const Dashboard = () => {
 							</div>
 
 							<div className="image_profile">
-								<img src={userImage} alt="User_Profile" />
+								<img src={userImage.isSet ? URL.createObjectURL(userImage.image) : userImage.image} style={{ cursor: 'pointer' }} alt="User_Profile" data-bs-target="#staticBackdrop" data-bs-toggle="modal" className='hover_image' />
+								{/* <EditIcon style={{ justifyContent: 'center', marginLeft: '-19px', marginTop: '24px', cursor: 'pointer' }} data-bs-target="#staticBackdrop" data-bs-toggle="modal" /> */}
+								<div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+									<div className="modal-dialog">
+										<div className="modal-content">
+											<div className="modal-header">
+												<img src={todo} alt="logo" /><h5 className="modal-title" id="staticBackdropLabel">  Account</h5>
+												<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div className="modal-body">
+												Profile picture
+											</div>
+											<div className="modal-body">
+												A picture helps people to recognise you and lets you know when you’re signed in to your account
+											</div>
+											<div className="modal-body">
+												<img src={userImage.isSet ? URL.createObjectURL(userImage.image) : userImage.image} alt="User_Profile" style={{
+													height: '270px', width: '270px', marginLeft: '57px', marginBottom: '20px'
+												}} />
+											</div>
+											<div className="modal_footer">
+												<input type="file" onChange={handleImageChange1} />
+												<button className='edit_img' onClick={editImage} data-bs-dismiss="modal" aria-label="Close">Edit</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
-							<h3>Hi,{userName} !</h3>
+							<h5>Hi,{userName} !</h5>
 							<div className="delete_profile">
-								<button className='btn_profile' onClick={() => deleteAccount(localStorage.getItem("token"))}> Delete A/C</button>
+								<button type="button" className='btn_profile' data-bs-toggle="modal" data-bs-target="#exampleModal">
+									Delete A/C
+								</button>
+							</div>
+							<div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div className="modal-dialog">
+									<div className="modal-content">
+										<div className="modal-header">
+											<h5 className="modal-title" ><PersonRemoveIcon style={{ color: "#dc4c3e" }} />  Delete Account</h5>
+											<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div className="modal-body">
+											Are You Sure, You Want To Delete Your Account?
+										</div>
+										<div className='footer'>
+											<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+											<button type="button" className="btn_delete_yes" data-bs-toggle="modal" data-bs-target="#exampleModal1">YES</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div className="modal-dialog">
+									<div className="modal-content">
+										<div className="modal-header1">
+											<h5 className="modal-title1" ><PersonRemoveIcon style={{ color: "#dc4c3e", marginLeft: '20px', marginRight: '10px' }} />  Delete Account</h5>
+											<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div className="modal-body">
+											Enter Your Password : <br />
+											<input type="password" className='model_password' onChange={(e) => { setDeletePassword(e.target.value) }} onKeyDown={handleKeyDown}
+											/>
+										</div>
+										<div className="modal-footer">
+
+											<button type="button" className="btn_delete_yes" data-bs-toggle="modal" data-bs-target="#exampleModal1" onClick={() => deleteAccount(localStorage.getItem("token"), deletePassword)} >Delete</button>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					)}
@@ -299,7 +434,7 @@ const Dashboard = () => {
 						<div className="title">
 							<h2>Today</h2>
 							<h6>{datee}</h6>
-							<div className="dashboard_view"><h4 ><ViewListIcon /></h4> <h3>view</h3></div>
+							{/* <div className="dashboard_view"><h4 ><ViewListIcon /></h4> <h3>view</h3></div> */}
 						</div>
 						<hr />
 						<div className="tasks-list"><br />

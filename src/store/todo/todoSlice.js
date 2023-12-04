@@ -3,7 +3,6 @@ import { sortData } from './todoMethods';
 
 const initialState = {
 	todos: [],
-	copyTodos: [],
 };
 
 export const todoSlice = createSlice({
@@ -14,15 +13,8 @@ export const todoSlice = createSlice({
 			state.todos.push(action.payload);
 			state.todos = sortData(state.todos)
 		},
-
-		setAllTodo: (state, action) => {
-			state.todos = state.copyTodos;
-		},
 		setTodo: (state, action) => {
 			state.todos = action.payload.data;
-			if (action.payload.isFirst) {
-				state.copyTodos = action.payload.data;
-			}
 		},
 		updateTodo: (state, action) => {
 			state.todos = state.todos.map((todo) => {

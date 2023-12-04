@@ -1,4 +1,4 @@
-export const baseUrl = "http://192.168.29.54:8000/api/v1";
+export const baseUrl = "https://todo-pt.onrender.com/api/v1";
 export const signUpUrl = `${baseUrl}/sign-up`;
 export const signInUrl = `${baseUrl}/sign-in`;
 export const forgotPasswordUrl = `${baseUrl}/forgot-password`;
@@ -14,3 +14,4 @@ export const googleLoginUrl = `${baseUrl}/google-login`;
 export const deleteAccountUrl = `${baseUrl}/delete-user`;
 export const searchTaskUrl = `${baseUrl}/search-task`;
 export const userDataUrl = `${baseUrl}/user-data`;
+export const changeProfileUrl = `${baseUrl}/change-profile`;

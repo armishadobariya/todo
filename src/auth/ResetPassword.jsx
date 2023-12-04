@@ -29,6 +29,7 @@ const ResetPassword = () => {
 	const [passwordError, setPasswordError] = useState('');
 
 	const email = location.state;
+	console.log(location.state);
 	if (email === null) {
 		return <Navigate to='/ForgotPassword' />
 	}
@@ -36,11 +37,12 @@ const ResetPassword = () => {
 	const validatePassword = (p, cf) => {
 
 		if (p.length < 8) {
-			setPasswordError(`Password must be between 8 characters`);
+			setPasswordError('Password must be between 8 characters');
+
 			return false;
 		}
 		else if (p !== cf) {
-			setPasswordError(`Password and confirm password is not same`);
+			setPasswordError('Password and confirm password is not same');
 			return false;
 		}
 		setPasswordError('');
@@ -68,9 +70,22 @@ const ResetPassword = () => {
 		catch (error) {
 			setResponse(error);
 			setResponse("error:", 'error');
+
 		}
 
 	};
+
+	const handleKeyDown = (event) => {
+		console.log("clicked");
+
+		if (event.key === 'Enter') {
+			console.log("enter clicked");
+			ResetPass(event);
+
+		};
+	}
+
+
 
 
 
@@ -113,6 +128,7 @@ const ResetPassword = () => {
 										setPassword(e.target.value);
 										// validatePassword(e.target.value);
 									}}
+
 									id="outlined-adornment-password"
 									type={showPassword ? 'text' : 'password'}
 									endAdornment={
@@ -145,6 +161,7 @@ const ResetPassword = () => {
 										borderRadius: "7px"
 									}}
 									value={cpassword}
+									onKeyDown={handleKeyDown}
 									onChange={(e) => { setCpassword(e.target.value) }}
 									id="outlined-adornment-password"
 									type={showConfirmPassword ? 'text' : 'password'}

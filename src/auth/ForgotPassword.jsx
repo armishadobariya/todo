@@ -29,6 +29,8 @@ const RedditTextField = styled((props) => (
 		},
 	}));
 
+
+
 const ForgotPassword = () => {
 
 	const [email, setEmail] = useState("");
@@ -38,6 +40,29 @@ const ForgotPassword = () => {
 	const [response, setResponse] = useState(null);
 	const [showOtp, setShowOtp] = useState(false);
 	const [verifyEmail, setVerifyEmail] = useState(" ");
+
+
+
+	const handleKeyDown = (event) => {
+		console.log("clicked");
+
+		if (event.key === 'Enter') {
+			console.log("enter clicked");
+			checkEmailExists(event);
+
+		};
+	}
+
+	const handleKeyDown1 = (event) => {
+		console.log("clicked");
+
+		if (event.key === 'Enter') {
+			console.log("enter clicked");
+			VerifyOtp(event);
+
+		};
+	}
+
 
 	const VerifyOtp = async (e) => {
 		try {
@@ -51,8 +76,10 @@ const ForgotPassword = () => {
 			navigate("/ResetPassword", { state: email });
 		}
 		catch (error) {
-			setResponse(error);
-			setResponse("error:", 'error');
+			// setResponse(error);
+			// setResponse("error:", 'error');
+			setResponse(alert(error.response.data.message));
+
 		}
 	};
 
@@ -70,13 +97,15 @@ const ForgotPassword = () => {
 			setVerifyEmail(responseData.data.message);
 			toggleForm();
 		} catch (error) {
-			setVerifyEmail("Email not found");
+			// setVerifyEmail("Email not found");
+			setResponse(alert(error.response.data.message));
+
 		}
 	};
 
 	return (
 		<div className="forgot_main">
-			
+
 			<div className="msg">
 				{response && <div>{response.message}</div>}
 			</div>
@@ -98,6 +127,7 @@ const ForgotPassword = () => {
 							marginTop: 11,
 							width: 200
 						}}
+						onKeyDown={handleKeyDown}
 						InputLabelProps={{
 							style: { color: 'black' }
 						}}
@@ -139,6 +169,7 @@ const ForgotPassword = () => {
 									style: { color: 'black' }
 								}}
 								value={otp}
+								onKeyDown={handleKeyDown1}
 								onChange={(e) => { setOtp(e.target.value) }}
 							/>
 							<br /><br />

@@ -17,6 +17,7 @@ import { googleLoginUrl } from './Api.jsx';
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
+
 const RedditTextField = styled((props) => (
 	<TextField InputProps={{ disableUnderline: true }} {...props} />
 ))
@@ -42,21 +43,32 @@ const Signup = () => {
 	const [email, setEmail] = useState('');
 	const [pass, setPass] = useState('');
 	const [response, setResponse] = useState(null);
-
+	const [nameErr, setNameErr] = useState('');
 	const [passwordError, setPasswordError] = useState('');
 
 	const navigate = useNavigate();
 
-	function alert(type, msg) {
-		const bs_class = (type === "success") ? "alert-success" : "alert-danger";
+	// function alert(type, msg) {
+	// 	const bs_class = (type === "success") ? "alert-success" : "alert-danger";
 
-		return (
-			<div className={`alert ${bs_class} alert-dismissible fade show custom-alert`} role="alert">
-				<strong className="me-3">{msg}</strong>
-				<button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		);
-	}
+	// 	return (
+	// 		<div className={`alert ${bs_class} alert-dismissible fade show custom-alert`} role="alert">
+	// 			<strong className="me-3">{msg}</strong>
+	// 			<button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	// 		</div>
+	// 	);
+	// }
+	const validateName = (p) => {
+		const onlyAlphabets = /^[a-zA-Z]+$/;
+
+		if (p.length <= 2 || !onlyAlphabets.test(p)) {
+
+			setNameErr('Name must be contain more than two Alphabets..');
+			return false;
+		}
+		setNameErr('');
+		return true;
+	};
 	const validatePassword = (p) => {
 
 
@@ -91,10 +103,23 @@ const Signup = () => {
 		}
 
 		catch (error) {
+			setResponse(alert(error.response.data.message));
 
-			setResponse(alert("error", 'Already register user...'));
+			// setResponse(alert("error", 'Already register user...'));
 		}
 	};
+
+	const handleKeyDown = (event) => {
+		console.log("clicked");
+
+		if (event.key === 'Enter') {
+			console.log("enter clicked");
+			RegisterUser(event);
+
+		};
+	}
+
+
 	return (
 		<>
 			<div className="msg">
@@ -113,6 +138,15 @@ const Signup = () => {
 							<div className="icon">
 								<GoogleOAuthProvider clientId="295805594505-sq8l6g2m1dlgnlepvim7h03gmo48gco3.apps.googleusercontent.com">
 									<GoogleLogin
+
+										style={{
+											backgroundColor: 'black', // Google's brand color
+											color: 'white',
+											padding: '10px',
+											borderRadius: '5px',
+											cursor: 'pointer',
+										}}
+
 										onSuccess={async (credentialResponse) => {
 											try {
 												console.log(credentialResponse);
@@ -142,7 +176,7 @@ const Signup = () => {
 									/>
 								</GoogleOAuthProvider>
 
-								<LoginSocialFacebook
+								{/* <LoginSocialFacebook
 									appId="654047430249892"
 									onResolve={(response) => {
 										console.log(response);
@@ -153,7 +187,7 @@ const Signup = () => {
 									}}
 								>
 									<FacebookLoginButton style={{ width: '352px', marginLeft: '0px', marginBottom: '12px' }} />
-								</LoginSocialFacebook>
+								</LoginSocialFacebook> */}
 
 
 								<hr className='line' />
@@ -171,8 +205,12 @@ const Signup = () => {
 											style: { color: 'black' }
 										}}
 										value={name}
-										onChange={(e) => { setName(e.target.value) }}
+										onChange={(e) => {
+											setName(e.target.value);
+											validateName(e.target.value);
+										}}
 									/>
+									<p style={{ color: 'red' }}>{nameErr}</p>
 								</div>
 								<div>
 									<RedditTextField
@@ -189,6 +227,7 @@ const Signup = () => {
 										onChange={(e) => { setEmail(e.target.value) }}
 									/>
 								</div>
+								<br />
 								<div>
 									<RedditTextField
 										label="Password"
@@ -202,6 +241,7 @@ const Signup = () => {
 											style: { color: 'black' }
 										}}
 										value={pass}
+										onKeyDown={handleKeyDown}
 										onChange={(e) => {
 											setPass(e.target.value);
 											validatePassword(e.target.value);
